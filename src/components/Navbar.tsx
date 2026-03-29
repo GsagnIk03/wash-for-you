@@ -1,0 +1,116 @@
+import React from 'react';
+import { useScrolled } from '../hooks';
+
+const Navbar: React.FC = () => {
+  const scrolled = useScrolled(40);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 999,
+      background: 'rgba(255,255,255,0.92)',
+      backdropFilter: 'blur(16px)',
+      borderBottom: '1px solid rgba(41,121,216,0.12)',
+      padding: '0 5%',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      height: 70,
+      boxShadow: scrolled
+        ? '0 4px 24px rgba(10,37,64,0.14)'
+        : '0 2px 12px rgba(10,37,64,0.08)',
+      transition: 'box-shadow 0.35s cubic-bezier(0.4,0,0.2,1)',
+    }}>
+      {/* Brand */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{
+          width: 42, height: 42,
+          background: 'linear-gradient(135deg, #2979D8, #3ECFCF)',
+          borderRadius: 12,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.3rem',
+        }}>💧</div>
+        <span style={{
+          fontFamily: "'Playfair Display', serif",
+          fontWeight: 700, fontSize: '1.25rem', color: '#0A2540',
+        }}>
+          Wash For<span style={{ color: '#2979D8' }}>You</span>
+        </span>
+      </div>
+
+      {/* Links */}
+      <NavLinks scrollTo={scrollTo} />
+    </nav>
+  );
+};
+
+const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({ scrollTo }) => {
+  const links = [
+    { label: 'Our Story', id: 'history' },
+    { label: 'Services',  id: 'services' },
+    { label: 'Pricing',   id: 'pricing' },
+  ];
+
+  return (
+    <ul style={{ display: 'flex', gap: 36, listStyle: 'none', alignItems: 'center' }}>
+      {links.map(link => (
+        <li key={link.id}>
+          <NavLink label={link.label} onClick={() => scrollTo(link.id)} />
+        </li>
+      ))}
+      <li>
+        <button
+          onClick={() => scrollTo('contact')}
+          style={{
+            background: 'linear-gradient(135deg, #2979D8, #1A4F8A)',
+            color: '#fff',
+            padding: '9px 22px',
+            borderRadius: 50,
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(41,121,216,0.35)',
+            fontFamily: "'DM Sans', sans-serif",
+            transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 24px rgba(41,121,216,0.45)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(41,121,216,0.35)';
+          }}
+        >
+          Book Now
+        </button>
+      </li>
+    </ul>
+  );
+};
+
+const NavLink: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick }) => {
+  const [hovered, setHovered] = React.useState(false);
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: 'none', border: 'none', cursor: 'pointer',
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: '0.9rem', fontWeight: 500,
+        color: hovered ? '#2979D8' : '#4A6FA5',
+        padding: '2px 0',
+        borderBottom: hovered ? '2px solid #2979D8' : '2px solid transparent',
+        transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {label}
+    </button>
+  );
+};
+
+export default Navbar;
