@@ -2,7 +2,7 @@
   "name": "wash-for-you",
   "version": "1.0.0",
   "private": true,
-  "description": "Wash For You — Eco-Friendly Steam Car Wash Landing Page",
+  "description": "Wash For You — Eco-Friendly Waterless Car Wash Landing Page",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

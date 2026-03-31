@@ -43,11 +43,12 @@ export interface BookingFormData {
   phone: string;
   service: string;
   vehicle: string;
+  vehicleNumber: string;
   preferred_date: string;
   message: string;
 }
 
-export type ToastStatus = 'idle' | 'success' | 'error';
+export type ToastStatus = "idle" | "success" | "error";
 
 export interface ToastState {
   message: string;
