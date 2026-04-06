@@ -152,9 +152,9 @@ export const CONTACT_INFO: ContactInfo[] = [
 // ─── EmailJS Config ───────────────────────────────────────────
 // ⚠️ Replace these with your actual EmailJS credentials
 export const EMAILJS_CONFIG = {
-  publicKey: "HYeMUNKyzOjWcm4pL",
+  publicKey: "fEIlbTRPD_cM_79YX",
   serviceId: "service_zfrdbze",
   templateToOwner: "template_j8k6ruu",
   templateToUser: "template_b1osyxe",
-  businessEmail: "support@washforyou.com",
+  businessEmail: "support@washforu.com",
 } as const;
