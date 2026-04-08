@@ -64,7 +64,7 @@ export const EMAILJS_CONFIG = {
   serviceId: "YOUR_SERVICE_ID", // ← from EmailJS Email Services
   templateToOwner: "template_to_owner", // ← your template ID
   templateToUser: "template_to_user", // ← your template ID
-  businessEmail: "support@washforyou.com", // ✅ already set
+  businessEmail: "support@washforu.com", // ✅ already set
 };
 ```
 
@@ -90,7 +90,7 @@ In `src/data/index.ts`, update `CONTACT_INFO`:
 ```ts
 export const CONTACT_INFO = [
   { icon: "📞", label: "Call / WhatsApp", value: "+91 XXXXX XXXXX" }, // ← your number
-  { icon: "✉️", label: "Email Us", value: "support@washforyou.com" },
+  { icon: "✉️", label: "Email Us", value: "support@washforu.com" },
   { icon: "📍", label: "Our Locations", value: "Salt Lake · New Town · ..." },
 ];
 ```
