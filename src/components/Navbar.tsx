@@ -2,6 +2,11 @@ import React, { useEffect } from "react";
 import { useScrolled } from "../hooks";
 
 const NAVBAR_CSS = `
+  html {
+    scroll-behavior: smooth;
+    /* This ensures the scroll stops before hitting the sticky header */
+    scroll-padding-top: 90px; 
+  }
   .nav-container {
     height: 70px;
     padding: 0 5%;
@@ -19,6 +24,9 @@ const NAVBAR_CSS = `
   }
   /* Mobile Responsive Adjustments */
   @media (max-width: 768px) {
+    html {
+      scroll-padding-top: 80px;
+    }
     .nav-container {
       padding: 0 4%;
     }
@@ -26,7 +34,7 @@ const NAVBAR_CSS = `
       gap: 12px;
     }
     .nav-link-desktop-only {
-      display: none; /* Hides text links on mobile so Book Now fits */
+      display: none; 
     }
     .nav-book-btn {
       padding: 8px 18px !important;
@@ -105,7 +113,7 @@ const Navbar: React.FC = () => {
             color: "#0A2540",
           }}
         >
-          Wash For<span style={{ color: "#2979D8" }}>You</span>
+          Wash For <span style={{ color: "#2979D8" }}>You</span>
         </span>
       </div>
 
@@ -137,7 +145,8 @@ const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({
       <li>
         <button
           className="nav-book-btn"
-          onClick={() => scrollTo("contact")}
+          /* Changed from 'contact' to 'booking-form' for precise mobile scrolling */
+          onClick={() => scrollTo("booking-form")}
           style={{
             background: "linear-gradient(135deg, #2979D8, #1A4F8A)",
             color: "#fff",
