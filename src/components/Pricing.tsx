@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useInView } from "../hooks";
 import { PRICING_PLANS } from "../data";
 import type { PricingPlan } from "../types";
