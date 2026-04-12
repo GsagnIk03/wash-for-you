@@ -17,7 +17,7 @@ const SERVICES = [
 const VEHICLES = ["Hatchback", "Sedan", "SUV / MUV", "Commercial Van"];
 
 // WhatsApp Business number (digits only, with country code)
-const WHATSAPP_NUMBER = "919477588518";
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 const RESPONSIVE_CSS = `
   /* ── Tablet: iPad Mini / Air / Pro (601px – 1024px) ── */

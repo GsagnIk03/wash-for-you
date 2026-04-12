@@ -152,9 +152,9 @@ export const CONTACT_INFO: ContactInfo[] = [
 // ─── EmailJS Config ───────────────────────────────────────────
 // ⚠️ Replace these with your actual EmailJS credentials
 export const EMAILJS_CONFIG = {
-  publicKey: "fEIlbTRPD_cM_79YX",
-  serviceId: "service_zfrdbze",
-  templateToOwner: "template_j8k6ruu",
-  templateToUser: "template_b1osyxe",
-  businessEmail: "support@washforu.com",
+  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+  templateToOwner: import.meta.env.VITE_EMAILJS_TEMPLATE_OWNER,
+  templateToUser: import.meta.env.VITE_EMAILJS_TEMPLATE_USER,
+  businessEmail: import.meta.env.VITE_EMAILJS_BUSINESS_EMAIL,
 } as const;
