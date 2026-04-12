@@ -1,19 +1,78 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CarWashIllustration from "./CarWashIllustration";
+
+const HERO_CSS = `
+  .hero-illustration {
+    position: absolute;
+    right: 4%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46%;
+    max-width: 580px;
+    z-index: 2;
+    pointer-events: none;
+    animation: heroFadeUp 1.1s 0.25s ease both;
+  }
+  /* Tablet: shrink and push down so it doesn't overlap text */
+  @media (min-width: 601px) and (max-width: 1024px) {
+    .hero-section {
+      padding: 120px 6% 80px !important;
+    }
+    .hero-illustration {
+      width: 38% !important;
+      right: 2% !important;
+      top: auto !important;
+      bottom: 0 !important;
+      transform: none !important;
+      opacity: 0.35 !important;
+    }
+    .hero-content {
+      max-width: 58% !important;
+    }
+  }
+  /* Mobile: hide illustration entirely */
+  @media (max-width: 600px) {
+    .hero-illustration {
+      display: none !important;
+    }
+    .hero-section {
+      padding: 100px 5% 64px !important;
+    }
+    .hero-content {
+      max-width: 100% !important;
+    }
+    .hero-stats {
+      gap: 24px !important;
+    }
+  }
+`;
 
 const Hero: React.FC = () => {
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
+  useEffect(() => {
+    const id = "hero-responsive-styles";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = HERO_CSS;
+    document.head.appendChild(style);
+    return () => {
+      document.getElementById(id)?.remove();
+    };
+  }, []);
+
   return (
     <section
+      className="hero-section"
       style={{
         minHeight: "100vh",
         background: `
-        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(41,121,216,0.18) 0%, transparent 65%),
-        radial-gradient(ellipse 60% 80% at 10% 80%, rgba(62,207,207,0.12) 0%, transparent 55%),
-        linear-gradient(160deg, #0A2540 0%, #0D3260 55%, #183F77 100%)
-      `,
+          radial-gradient(ellipse 80% 60% at 70% 50%, rgba(41,121,216,0.18) 0%, transparent 65%),
+          radial-gradient(ellipse 60% 80% at 10% 80%, rgba(62,207,207,0.12) 0%, transparent 55%),
+          linear-gradient(160deg, #0A2540 0%, #0D3260 55%, #183F77 100%)
+        `,
         display: "flex",
         alignItems: "center",
         padding: "120px 5% 80px",
@@ -51,6 +110,7 @@ const Hero: React.FC = () => {
 
       {/* Content */}
       <div
+        className="hero-content"
         style={{
           maxWidth: 520,
           position: "relative",
@@ -129,15 +189,15 @@ const Hero: React.FC = () => {
           />
         </div>
 
-        {/* Stats */}
+        {/* Stats — 4.9★ removed, 3 stats only */}
         <div
+          className="hero-stats"
           style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap" }}
         >
           {[
             { num: "95%", label: "Water Saved" },
-            { num: "3,000+", label: "Cars Washed" },
+            { num: "500+", label: "Cars Washed" },
             { num: "100%", label: "Chemical-Free" },
-            { num: "4.9★", label: "Customer Rating" },
           ].map((s) => (
             <div key={s.label}>
               <div
@@ -164,21 +224,8 @@ const Hero: React.FC = () => {
         </div>
       </div>
 
-      {/* SVG Illustration */}
-      <div
-        style={{
-          position: "absolute",
-          right: "4%",
-          top: "50%",
-          transform: "translateY(-50%)",
-          width: "46%",
-          maxWidth: 580,
-          zIndex: 2,
-          pointerEvents: "none",
-          animation: "heroFadeUp 1.1s 0.25s ease both",
-        }}
-      >
-        {/* Glow */}
+      {/* SVG Illustration — hidden mobile, faded tablet, full desktop */}
+      <div className="hero-illustration">
         <div
           style={{
             position: "absolute",
