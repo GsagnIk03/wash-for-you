@@ -118,7 +118,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 1999,
     vehicleNote: "Hatchback · ₹1,999 Sedan · ₹2,299 SUV",
     features: [
-      "Everything in Premium Detail",
+      "Everything in Interior Premium Deep Detailing",
       "Engine bay Waterless clean",
       "Paint decontamination prep",
       "Ceramic spray coating",
