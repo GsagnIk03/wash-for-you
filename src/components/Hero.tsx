@@ -191,7 +191,7 @@ const Hero: React.FC = () => {
           />
         </div>
 
-        {/* Stats */}
+        {/* Stats
         <div
           className="hero-stats"
           style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap" }}
@@ -223,7 +223,7 @@ const Hero: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
 
       {/* SVG Illustration */}
