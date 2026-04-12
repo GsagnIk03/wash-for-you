@@ -13,21 +13,23 @@ const HERO_CSS = `
     pointer-events: none;
     animation: heroFadeUp 1.1s 0.25s ease both;
   }
-  /* Tablet: shrink and push down so it doesn't overlap text */
+  /* Tablet: Keep side-by-side but shrink and fade slightly to prevent overlap */
   @media (min-width: 601px) and (max-width: 1024px) {
     .hero-section {
-      padding: 120px 6% 80px !important;
+      padding: 120px 5% 80px !important;
     }
     .hero-illustration {
-      width: 38% !important;
-      right: 2% !important;
-      top: auto !important;
-      bottom: 0 !important;
-      transform: none !important;
-      opacity: 0.35 !important;
+      width: 42% !important;
+      right: -2% !important;
+      top: 50% !important;
+      bottom: auto !important;
+      transform: translateY(-50%) !important;
+      opacity: 0.5 !important;
     }
     .hero-content {
-      max-width: 58% !important;
+      max-width: 65% !important;
+      position: relative !important;
+      z-index: 5 !important;
     }
   }
   /* Mobile: hide illustration entirely */
@@ -189,14 +191,14 @@ const Hero: React.FC = () => {
           />
         </div>
 
-        {/* Stats — 4.9★ removed, 3 stats only */}
+        {/* Stats */}
         <div
           className="hero-stats"
           style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap" }}
         >
           {[
             { num: "95%", label: "Water Saved" },
-            { num: "500+", label: "Cars Washed" },
+            { num: "50+", label: "Cars Washed" },
             { num: "100%", label: "Chemical-Free" },
           ].map((s) => (
             <div key={s.label}>
@@ -224,7 +226,7 @@ const Hero: React.FC = () => {
         </div>
       </div>
 
-      {/* SVG Illustration — hidden mobile, faded tablet, full desktop */}
+      {/* SVG Illustration */}
       <div className="hero-illustration">
         <div
           style={{

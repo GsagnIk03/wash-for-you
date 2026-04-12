@@ -129,7 +129,18 @@ const Contact: React.FC<ContactProps> = ({
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >,
-  ) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  ) => {
+    const { name, value } = e.target;
+
+    // Apply strict validation logic for the phone field as the user types
+    if (name === "phone") {
+      // Only allow numbers, spaces, and a leading plus sign
+      const sanitizedValue = value.replace(/[^\d\s+]/g, "");
+      setForm((f) => ({ ...f, [name]: sanitizedValue }));
+    } else {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
 
   /** Build a WhatsApp pre-filled message from the form data */
   const buildWhatsAppURL = (f: BookingFormData) => {
@@ -150,6 +161,18 @@ const Contact: React.FC<ContactProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Strict Indian Phone Number Validation
+    // ONLY matches a 10-digit number optionally prefixed by +91 or 91
+    const phoneRegex = /^(?:\+?91[\s-]?)?[6-9]\d{9}$/;
+
+    if (!phoneRegex.test(form.phone.trim())) {
+      showToast(
+        "Please enter a valid 10-digit phone number (+91 optional).",
+        true,
+      );
+      return;
+    }
 
     setSubmitting(true);
 
@@ -549,6 +572,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
               value={form.phone}
               onChange={onChange}
               placeholder="+91 98300 00000"
+              pattern="^(?:\+?91[\s-]?)?[6-9]\d{9}$"
+              title="Please enter a 10-digit number, optionally starting with +91 or 91"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Please provide a valid 10-digit number (e.g. 9876543210 or +91 9876543210)",
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
               required
             />
           </FormGroup>
