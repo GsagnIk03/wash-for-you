@@ -14,13 +14,7 @@ const SERVICES = [
   "Ultimate Spa",
   "General Query",
 ];
-const VEHICLES = [
-  "Hatchback",
-  "Sedan",
-  "SUV / MUV",
-  "Commercial Van",
-  "Motorcycle / Scooter",
-];
+const VEHICLES = ["Hatchback", "Sedan", "SUV / MUV", "Commercial Van"];
 
 // WhatsApp Business number (digits only, with country code)
 const WHATSAPP_NUMBER = "919477588518";
