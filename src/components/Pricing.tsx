@@ -22,9 +22,9 @@ const REVIEWS = [
     location: "Garia",
     rating: 5,
     review:
-      "The waterless wash is genuinely impressive. No water wastage, no mess, and the finish is spotless. Booked twice this month already — highly recommend the Premium Detail!",
+      "The waterless wash is genuinely impressive. No water wastage, no mess, and the finish is spotless. Booked twice this month already — highly recommend the Interior Premium Deep Detailing!",
     avatar: "PS",
-    service: "Premium Detail",
+    service: "Interior Premium Deep Detailing",
   },
   {
     name: "Rohit Das",
@@ -51,7 +51,7 @@ const REVIEWS = [
     review:
       "Very professional service. The interior detailing was meticulous — every corner was cleaned. Booking via WhatsApp was super easy. Will definitely return.",
     avatar: "DR",
-    service: "Premium Detail",
+    service: "Interior Premium Deep Detailing",
   },
   {
     name: "Ananya Chakraborty",

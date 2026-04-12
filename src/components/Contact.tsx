@@ -10,7 +10,7 @@ interface ContactProps {
 
 const SERVICES = [
   "Essential Clean",
-  "Premium Detail",
+  "Interior Premium Deep Detailing",
   "Ultimate Spa",
   "General Query",
 ];
