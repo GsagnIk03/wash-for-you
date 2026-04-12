@@ -1,52 +1,78 @@
 import React, { useEffect } from "react";
 import { useScrolled } from "../hooks";
+import logoImg from "../logo_final.png";
 
 const NAVBAR_CSS = `
   html {
     scroll-behavior: smooth;
-    /* This ensures the scroll stops before hitting the sticky header */
-    scroll-padding-top: 90px; 
+    scroll-padding-top: 90px;
   }
+
   .nav-container {
-    height: 70px;
-    padding: 0 5%;
+    height: 90px;
+    padding: 0 5% 0 16px;
   }
+
+  .nav-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    height: 100%;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .nav-logo-img {
+    height: 88px;
+    width: auto;
+    object-fit: contain;
+    object-position: left center;
+    display: block;
+    transition: opacity 0.25s ease;
+  }
+
+  .nav-logo-img:hover {
+    opacity: 0.85;
+  }
+
   .nav-links-list {
     gap: 36px;
   }
-  .nav-brand-text {
-    font-size: 1.25rem;
-  }
-  .nav-brand-icon {
-    width: 42px;
-    height: 42px;
-    font-size: 1.3rem;
-  }
-  /* Mobile Responsive Adjustments */
-  @media (max-width: 768px) {
-    html {
-      scroll-padding-top: 80px;
+
+  @media (max-width: 1024px) {
+    .nav-links-list {
+      gap: 20px;
     }
+  }
+
+  @media (max-width: 768px) {
     .nav-container {
-      padding: 0 4%;
+      height: 90px;
+      padding: 0 4% 0 16px;
+    }
+    .nav-logo-img {
+      height: 85px;
     }
     .nav-links-list {
-      gap: 12px;
+      gap: 10px;
     }
     .nav-link-desktop-only {
-      display: none; 
+      display: none;
     }
     .nav-book-btn {
-      padding: 8px 18px !important;
-      font-size: 0.85rem !important;
+      padding: 7px 16px !important;
+      font-size: 0.82rem !important;
     }
-    .nav-brand-text {
-      font-size: 1.1rem !important;
+  }
+
+  @media (max-width: 375px) {
+    .nav-container {
+      height: 90px;
+      padding: 0 3% 0 16px;
     }
-    .nav-brand-icon {
-      width: 36px !important;
-      height: 36px !important;
-      font-size: 1.1rem !important;
+    .nav-logo-img {
+      height: 85px;
     }
   }
 `;
@@ -79,8 +105,7 @@ const Navbar: React.FC = () => {
         left: 0,
         right: 0,
         zIndex: 999,
-        background: "rgba(255,255,255,0.92)",
-        backdropFilter: "blur(16px)",
+        background: "#fff",
         borderBottom: "1px solid rgba(41,121,216,0.12)",
         display: "flex",
         alignItems: "center",
@@ -91,41 +116,21 @@ const Navbar: React.FC = () => {
         transition: "box-shadow 0.35s cubic-bezier(0.4,0,0.2,1)",
       }}
     >
-      {/* Brand */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div
-          className="nav-brand-icon"
-          style={{
-            background: "linear-gradient(135deg, #2979D8, #3ECFCF)",
-            borderRadius: 12,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          💧
-        </div>
-        <span
-          className="nav-brand-text"
-          style={{
-            fontFamily: "'Playfair Display', serif",
-            fontWeight: 700,
-            color: "#0A2540",
-          }}
-        >
-          Wash For <span style={{ color: "#2979D8" }}>You</span>
-        </span>
+      <div
+        className="nav-logo-wrapper"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <img src={logoImg} alt="Wash For U Logo" className="nav-logo-img" />
       </div>
 
-      {/* Links */}
-      <NavLinks scrollTo={scrollTo} />
+      <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+        <NavLinks scrollTo={scrollTo} />
+      </div>
     </nav>
   );
 };
 
-const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({
-  scrollTo,
-}) => {
+const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({ scrollTo }) => {
   const links = [
     { label: "Our Story", id: "history" },
     { label: "Services", id: "services" },
@@ -135,7 +140,7 @@ const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({
   return (
     <ul
       className="nav-links-list"
-      style={{ display: "flex", listStyle: "none", alignItems: "center" }}
+      style={{ display: "flex", listStyle: "none", alignItems: "center", margin: 0, padding: 0 }}
     >
       {links.map((link) => (
         <li key={link.id} className="nav-link-desktop-only">
@@ -145,7 +150,6 @@ const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({
       <li>
         <button
           className="nav-book-btn"
-          /* Changed from 'contact' to 'booking-form' for precise mobile scrolling */
           onClick={() => scrollTo("booking-form")}
           style={{
             background: "linear-gradient(135deg, #2979D8, #1A4F8A)",
@@ -161,16 +165,12 @@ const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({
             transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform =
-              "translateY(-2px)";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow =
-              "0 8px 24px rgba(41,121,216,0.45)";
+            (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 24px rgba(41,121,216,0.45)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform =
-              "translateY(0)";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow =
-              "0 4px 16px rgba(41,121,216,0.35)";
+            (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 16px rgba(41,121,216,0.35)";
           }}
         >
           Book Now
@@ -180,10 +180,7 @@ const NavLinks: React.FC<{ scrollTo: (id: string) => void }> = ({
   );
 };
 
-const NavLink: React.FC<{ label: string; onClick: () => void }> = ({
-  label,
-  onClick,
-}) => {
+const NavLink: React.FC<{ label: string; onClick: () => void }> = ({ label, onClick }) => {
   const [hovered, setHovered] = React.useState(false);
   return (
     <button
