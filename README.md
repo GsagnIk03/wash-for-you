@@ -37,14 +37,11 @@ wash-for-you/
 
 ```bash
 # 1. Install dependencies
-npm install
+yarn install
 
 # 2. Start dev server (opens at http://localhost:3000)
-npm run dev
+yarn run dev
 
 # 3. Build for production
-npm run build
-
-# 4. Preview production build
-npm run preview
+yarn build
 ```

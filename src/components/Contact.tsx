@@ -496,6 +496,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   return (
     <div
       ref={ref}
+      /* Added ID for precise mobile anchor scrolling from Navbar */
+      id="booking-form"
       className={`fade-up booking-form-card${inView ? " visible" : ""}`}
       style={{
         background: "#fff",
