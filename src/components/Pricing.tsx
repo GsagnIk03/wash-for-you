@@ -1,70 +1,446 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useInView } from "../hooks";
-import { PRICING_PLANS, ADDONS } from "../data";
-import type { PricingPlan, AddonItem } from "../types";
+import { PRICING_PLANS } from "../data";
+import type { PricingPlan } from "../types";
 
 interface PricingProps {
   onSelectPlan: (planName: string) => void;
 }
 
-const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => (
-  <section id="pricing" style={{ padding: "100px 5%", background: "#fff" }}>
-    <div style={{ marginBottom: 56 }}>
-      <div className="section-label">Transparent Pricing</div>
-      <h2 className="section-title">Simple, Honest Rates</h2>
-      <p className="section-sub">
-        No hidden charges. No upselling. Just premium eco-friendly Waterless
-        wash at fair prices across South Kolkata.
-      </p>
-    </div>
+const REVIEWS = [
+  {
+    name: "Arjun Mehta",
+    location: "Jadavpur",
+    rating: 5,
+    review:
+      "Absolutely blown away! My car looks brand new without a drop of water. The team was punctual, professional, and thorough. Will never go back to a traditional car wash.",
+    avatar: "AM",
+    service: "Ultimate Spa",
+  },
+  {
+    name: "Priya Sengupta",
+    location: "Garia",
+    rating: 5,
+    review:
+      "The waterless wash is genuinely impressive. No water wastage, no mess, and the finish is spotless. Booked twice this month already — highly recommend the Premium Detail!",
+    avatar: "PS",
+    service: "Premium Detail",
+  },
+  {
+    name: "Rohit Das",
+    location: "Dhakuria",
+    rating: 5,
+    review:
+      "Easy to book, on-time service, and amazing results. My SUV had stubborn dust and they got it looking showroom-fresh. Great value for money.",
+    avatar: "RD",
+    service: "Essential Clean",
+  },
+  {
+    name: "Susmita Bose",
+    location: "Baghajatin",
+    rating: 5,
+    review:
+      "Love that it's 100% chemical-free. As someone who cares about the environment, Wash For You is the only car wash service I'll trust. Fantastic team!",
+    avatar: "SB",
+    service: "Ultimate Spa",
+  },
+  {
+    name: "Debajyoti Roy",
+    location: "Jadavpur",
+    rating: 4,
+    review:
+      "Very professional service. The interior detailing was meticulous — every corner was cleaned. Booking via WhatsApp was super easy. Will definitely return.",
+    avatar: "DR",
+    service: "Premium Detail",
+  },
+  {
+    name: "Ananya Chakraborty",
+    location: "Garia",
+    rating: 5,
+    review:
+      "I was skeptical about waterless washing but after seeing the results, I'm converted. Crystal clear windows, shiny exterior — all done in under an hour!",
+    avatar: "AC",
+    service: "Essential Clean",
+  },
+];
 
+const REVIEWS_CSS = `
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (min-width: 601px) and (max-width: 1024px) {
+    .reviews-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .pricing-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  @media (max-width: 600px) {
+    .reviews-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .pricing-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+`;
+
+const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
+  useEffect(() => {
+    const id = "pricing-responsive-styles";
+    if (document.getElementById(id)) return;
+    const style = document.createElement("style");
+    style.id = id;
+    style.textContent = REVIEWS_CSS;
+    document.head.appendChild(style);
+    return () => {
+      document.getElementById(id)?.remove();
+    };
+  }, []);
+
+  return (
+    <>
+      {/* ── Pricing Section ── */}
+      <section id="pricing" style={{ padding: "100px 5%", background: "#fff" }}>
+        <div style={{ marginBottom: 56 }}>
+          <div className="section-label">Transparent Pricing</div>
+          <h2 className="section-title">Simple, Honest Rates</h2>
+          <p className="section-sub">
+            No hidden charges. No upselling. Just premium eco-friendly waterless
+            wash at fair prices across South Kolkata.
+          </p>
+        </div>
+
+        <div
+          className="pricing-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 28,
+            alignItems: "start",
+          }}
+        >
+          {PRICING_PLANS.map((plan, i) => (
+            <PricingCard
+              key={i}
+              plan={plan}
+              delay={i * 100}
+              onSelect={() => onSelectPlan(plan.name)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Customer Reviews Section ── */}
+      <section
+        id="reviews"
+        style={{
+          padding: "100px 5%",
+          background: "linear-gradient(160deg, #0A2540 0%, #0F3875 100%)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Ambient glow */}
+        <div
+          style={{
+            position: "absolute",
+            top: -150,
+            right: -150,
+            width: 500,
+            height: 500,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(62,207,207,0.08) 0%, transparent 65%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div style={{ position: "relative", zIndex: 2 }}>
+          {/* Header */}
+          <div style={{ marginBottom: 16, textAlign: "center" }}>
+            <div
+              className="section-label"
+              style={{ color: "#3ECFCF", justifyContent: "center" }}
+            >
+              What Customers Say
+            </div>
+            <h2
+              className="section-title"
+              style={{ color: "#fff", textAlign: "center" }}
+            >
+              Loved by Car Owners
+              <br />
+              Across South Kolkata
+            </h2>
+          </div>
+
+          {/* Overall rating bar */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 20,
+              marginBottom: 56,
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 16,
+                padding: "20px 36px",
+                display: "flex",
+                alignItems: "center",
+                gap: 20,
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              <div style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "3.5rem",
+                    fontWeight: 900,
+                    color: "#fff",
+                    lineHeight: 1,
+                  }}
+                >
+                  4.9
+                </div>
+                <div
+                  style={{
+                    color: "#F5C518",
+                    fontSize: "1.3rem",
+                    letterSpacing: 2,
+                  }}
+                >
+                  ★★★★★
+                </div>
+                <div
+                  style={{
+                    color: "rgba(255,255,255,0.5)",
+                    fontSize: "0.8rem",
+                    marginTop: 4,
+                  }}
+                >
+                  Average Rating
+                </div>
+              </div>
+              <div
+                style={{
+                  width: 1,
+                  height: 60,
+                  background: "rgba(255,255,255,0.15)",
+                  margin: "0 8px",
+                }}
+              />
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {[
+                  { stars: 5, pct: 91 },
+                  { stars: 4, pct: 7 },
+                  { stars: 3, pct: 2 },
+                ].map(({ stars, pct }) => (
+                  <div
+                    key={stars}
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <span
+                      style={{
+                        color: "#F5C518",
+                        fontSize: "0.8rem",
+                        minWidth: 16,
+                      }}
+                    >
+                      {stars}★
+                    </span>
+                    <div
+                      style={{
+                        width: 120,
+                        height: 6,
+                        background: "rgba(255,255,255,0.1)",
+                        borderRadius: 3,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${pct}%`,
+                          height: "100%",
+                          background:
+                            "linear-gradient(90deg, #3ECFCF, #2979D8)",
+                          borderRadius: 3,
+                        }}
+                      />
+                    </div>
+                    <span
+                      style={{
+                        color: "rgba(255,255,255,0.4)",
+                        fontSize: "0.78rem",
+                        minWidth: 28,
+                      }}
+                    >
+                      {pct}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div
+                style={{
+                  width: 1,
+                  height: 60,
+                  background: "rgba(255,255,255,0.15)",
+                  margin: "0 8px",
+                }}
+              />
+              <div style={{ textAlign: "center" }}>
+                <div
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "2rem",
+                    fontWeight: 900,
+                    color: "#fff",
+                    lineHeight: 1,
+                  }}
+                >
+                  200+
+                </div>
+                <div
+                  style={{
+                    color: "rgba(255,255,255,0.5)",
+                    fontSize: "0.8rem",
+                    marginTop: 4,
+                  }}
+                >
+                  Verified Reviews
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Review cards */}
+          <div className="reviews-grid">
+            {REVIEWS.map((r, i) => (
+              <ReviewCard key={i} review={r} delay={i * 80} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
+
+/* ── Review Card ── */
+const ReviewCard: React.FC<{ review: (typeof REVIEWS)[0]; delay: number }> = ({
+  review,
+  delay,
+}) => {
+  const [ref, inView] = useInView<HTMLDivElement>();
+  const [hovered, setHovered] = useState(false);
+
+  return (
     <div
+      ref={ref}
+      className={`fade-up${inView ? " visible" : ""}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        gap: 28,
-        alignItems: "start",
+        background: hovered
+          ? "rgba(255,255,255,0.11)"
+          : "rgba(255,255,255,0.07)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 18,
+        padding: "28px 24px",
+        transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
+        transitionDelay: `${delay}ms`,
+        transform: hovered ? "translateY(-4px)" : "none",
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
       }}
     >
-      {PRICING_PLANS.map((plan, i) => (
-        <PricingCard
-          key={i}
-          plan={plan}
-          delay={i * 100}
-          onSelect={() => onSelectPlan(plan.name)}
-        />
-      ))}
-    </div>
+      {/* Stars */}
+      <div style={{ color: "#F5C518", fontSize: "1rem", letterSpacing: 2 }}>
+        {"★".repeat(review.rating)}
+        {review.rating < 5 && (
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>
+            {"★".repeat(5 - review.rating)}
+          </span>
+        )}
+      </div>
 
-    {/* Add-ons */}
-    <div style={{ marginTop: 72 }}>
-      <h3
+      {/* Quote */}
+      <p
         style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: "1.5rem",
-          fontWeight: 800,
-          color: "#0A2540",
-          marginBottom: 28,
-          textAlign: "center",
+          fontSize: "0.9rem",
+          lineHeight: 1.7,
+          color: "rgba(255,255,255,0.8)",
+          fontStyle: "italic",
+          flexGrow: 1,
         }}
       >
-        À La Carte Add-Ons
-      </h3>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 16,
-        }}
-      >
-        {ADDONS.map((addon, i) => (
-          <AddonCard key={i} addon={addon} delay={i * 80} />
-        ))}
+        "{review.review}"
+      </p>
+
+      {/* Service tag */}
+      <div>
+        <span
+          style={{
+            display: "inline-block",
+            background: "rgba(62,207,207,0.15)",
+            border: "1px solid rgba(62,207,207,0.3)",
+            color: "#3ECFCF",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            padding: "3px 10px",
+            borderRadius: 50,
+            textTransform: "uppercase",
+          }}
+        >
+          {review.service}
+        </span>
+      </div>
+
+      {/* Author */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #2979D8, #3ECFCF)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 800,
+            fontSize: "0.8rem",
+            color: "#fff",
+            flexShrink: 0,
+          }}
+        >
+          {review.avatar}
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, color: "#fff", fontSize: "0.9rem" }}>
+            {review.name}
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.78rem" }}>
+            📍 {review.location}
+          </div>
+        </div>
       </div>
     </div>
-  </section>
-);
+  );
+};
 
+/* ── Pricing Card ── */
 const PricingCard: React.FC<{
   plan: PricingPlan;
   delay: number;
@@ -247,48 +623,6 @@ const PricingCard: React.FC<{
       >
         Book This Plan
       </button>
-    </div>
-  );
-};
-
-const AddonCard: React.FC<{ addon: AddonItem; delay: number }> = ({
-  addon,
-  delay,
-}) => {
-  const [ref, inView] = useInView<HTMLDivElement>();
-  const [hovered, setHovered] = React.useState(false);
-
-  return (
-    <div
-      ref={ref}
-      className={`fade-up${inView ? " visible" : ""}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: hovered ? "#E8F1FB" : "#F3F8FF",
-        border: "1px solid rgba(41,121,216,0.12)",
-        borderRadius: 14,
-        padding: "22px 18px",
-        textAlign: "center",
-        transform: hovered ? "translateY(-4px)" : "none",
-        transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
-        transitionDelay: `${delay}ms`,
-      }}
-    >
-      <div style={{ fontSize: "1.8rem", marginBottom: 8 }}>{addon.emoji}</div>
-      <div style={{ fontWeight: 700, fontSize: "0.9rem", marginBottom: 6 }}>
-        {addon.name}
-      </div>
-      <div
-        style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: "1.25rem",
-          fontWeight: 900,
-          color: "#2979D8",
-        }}
-      >
-        ₹{addon.price}
-      </div>
     </div>
   );
 };
