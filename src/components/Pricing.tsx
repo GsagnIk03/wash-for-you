@@ -309,7 +309,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
                     lineHeight: 1,
                   }}
                 >
-                  200+
+                  50+
                 </div>
                 <div
                   style={{
