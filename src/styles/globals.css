@@ -232,3 +232,11 @@ a {
     gap: 0 !important;
   }
 }
+/* ─── iOS datetime-local fix ───────────────────────────────── */
+input[type="datetime-local"] {
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 0.85rem;
+}
