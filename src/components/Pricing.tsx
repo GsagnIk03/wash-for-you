@@ -7,45 +7,11 @@ interface PricingProps {
   onSelectPlan: (planName: string) => void;
 }
 
-// const REVIEWS = [
-//   {
-//     name: "Arjun Mehta",
-//     location: "Jadavpur",
-//     rating: 5,
-//     review: "Absolutely blown away! My car looks brand new without a drop of water. The team was punctual, professional, and thorough.",
-//     avatar: "AM",
-//     service: "Ultimate Spa",
-//   },
-//   {
-//     name: "Priya Sengupta",
-//     location: "Garia",
-//     rating: 5,
-//     review: "The waterless wash is genuinely impressive. No water wastage, no mess, and the finish is spotless.",
-//     avatar: "PS",
-//     service: "Interior Premium Deep Detailing",
-//   },
-//   {
-//     name: "Rohit Das",
-//     location: "Dhakuria",
-//     rating: 5,
-//     review: "Easy to book, on-time service, and amazing results. My SUV had stubborn dust and they got it looking showroom-fresh.",
-//     avatar: "RD",
-//     service: "Essential Clean",
-//   },
-// ];
-
-const REVIEWS_CSS = `
-  .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  @media (max-width: 1024px) {
-    .reviews-grid { grid-template-columns: repeat(2, 1fr) !important; }
+const PRICING_CSS = `
+  @media (max-width: 1100px) {
     .pricing-grid { grid-template-columns: repeat(2, 1fr) !important; }
   }
   @media (max-width: 600px) {
-    .reviews-grid { grid-template-columns: 1fr !important; }
     .pricing-grid { grid-template-columns: 1fr !important; }
   }
 `;
@@ -56,7 +22,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
     if (document.getElementById(id)) return;
     const style = document.createElement("style");
     style.id = id;
-    style.textContent = REVIEWS_CSS;
+    style.textContent = PRICING_CSS;
     document.head.appendChild(style);
     return () => {
       document.getElementById(id)?.remove();
@@ -64,66 +30,35 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
   }, []);
 
   return (
-    <>
-      <section id="pricing" style={{ padding: "100px 5%", background: "#fff" }}>
-        <div style={{ marginBottom: 56 }}>
-          <div className="section-label">Transparent Pricing</div>
-          <h2 className="section-title">Simple, Honest Rates</h2>
-          <p className="section-sub">
-            No hidden charges. No upselling. Just premium eco-friendly waterless
-            wash at fair prices across South Kolkata.
-          </p>
-        </div>
+    <section id="pricing" style={{ padding: "100px 5%", background: "#fff" }}>
+      <div style={{ marginBottom: 56 }}>
+        <div className="section-label">Transparent Pricing</div>
+        <h2 className="section-title">Simple, Honest Rates</h2>
+        <p className="section-sub">
+          No hidden charges. No upselling. Just premium eco-friendly waterless
+          wash at fair prices across South Kolkata.
+        </p>
+      </div>
 
-        <div
-          className="pricing-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 28,
-            alignItems: "start",
-          }}
-        >
-          {PRICING_PLANS.map((plan, i) => (
-            <PricingCard
-              key={i}
-              plan={plan}
-              delay={i * 100}
-              onSelect={() => onSelectPlan(plan.name)}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* ── Customer Reviews Section (Commented Out) ──
-      <section
-        id="reviews"
+      <div
+        className="pricing-grid"
         style={{
-          padding: "100px 5%",
-          background: "linear-gradient(160deg, #0A2540 0%, #0F3875 100%)",
-          position: "relative",
-          overflow: "hidden",
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 24,
+          alignItems: "start",
         }}
       >
-        <div style={{ position: "relative", zIndex: 2 }}>
-          <div style={{ marginBottom: 16, textAlign: "center" }}>
-            <div className="section-label" style={{ color: "#3ECFCF", justifyContent: "center" }}>
-              What Customers Say
-            </div>
-            <h2 className="section-title" style={{ color: "#fff", textAlign: "center" }}>
-              Loved by Car Owners Across South Kolkata
-            </h2>
-          </div>
-
-          <div className="reviews-grid">
-            {REVIEWS.map((r, i) => (
-              <ReviewCard key={i} review={r} delay={i * 80} />
-            ))}
-          </div>
-        </div>
-      </section>
-      */}
-    </>
+        {PRICING_PLANS.map((plan, i) => (
+          <PricingCard
+            key={i}
+            plan={plan}
+            delay={i * 100}
+            onSelect={() => onSelectPlan(plan.name)}
+          />
+        ))}
+      </div>
+    </section>
   );
 };
 
@@ -145,37 +80,147 @@ const PricingCard: React.FC<{
       onMouseLeave={() => setHovered(false)}
       style={{
         borderRadius: 20,
-        padding: "40px 32px",
+        padding: "36px 28px",
         border: plan.featured ? "none" : "2px solid #E8F1FB",
-        background: plan.featured ? "linear-gradient(160deg, #0A2540, #1A4F8A)" : "#fff",
+        background: plan.featured
+          ? "linear-gradient(160deg, #0A2540, #1A4F8A)"
+          : "#fff",
         color: plan.featured ? "#fff" : "#0A2540",
         transform: hovered ? "translateY(-6px)" : "none",
-        boxShadow: hovered ? "0 20px 60px rgba(10,37,64,0.18)" : "none",
+        boxShadow: hovered
+          ? "0 20px 60px rgba(10,37,64,0.18)"
+          : plan.featured
+          ? "0 8px 32px rgba(10,37,64,0.18)"
+          : "none",
         transition: "all 0.35s ease",
         transitionDelay: `${delay}ms`,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", fontWeight: 700 }}>{plan.name}</div>
-      <div style={{ fontSize: "3rem", fontWeight: 900, margin: "20px 0" }}>₹{plan.price}</div>
-      <ul style={{ listStyle: "none", marginBottom: 30 }}>
+      {/* Plan name */}
+      <div
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontSize: "1.1rem",
+          fontWeight: 700,
+          lineHeight: 1.3,
+          minHeight: "2.8rem",
+        }}
+      >
+        {plan.name}
+      </div>
+
+      {/* Tagline */}
+      <div
+        style={{
+          fontSize: "0.8rem",
+          opacity: 0.7,
+          marginTop: 6,
+          minHeight: "2.4rem",
+        }}
+      >
+        {plan.tagline}
+      </div>
+
+      {/* Price */}
+      <div
+        style={{
+          fontSize: "2.6rem",
+          fontWeight: 900,
+          margin: "20px 0 4px",
+          letterSpacing: "-1px",
+        }}
+      >
+        ₹{plan.price}
+      </div>
+
+      {/* Vehicle note (if any) */}
+      {plan.vehicleNote && (
+        <div
+          style={{
+            fontSize: "0.72rem",
+            opacity: 0.65,
+            marginBottom: 16,
+            fontStyle: "italic",
+          }}
+        >
+          * {plan.vehicleNote}
+        </div>
+      )}
+
+      {/* Divider */}
+      <div
+        style={{
+          height: 1,
+          background: plan.featured
+            ? "rgba(255,255,255,0.15)"
+            : "rgba(10,37,64,0.08)",
+          margin: "16px 0",
+        }}
+      />
+
+      {/* Features list */}
+      <ul
+        style={{
+          listStyle: "none",
+          padding: 0,
+          margin: "0 0 24px",
+          flex: 1,
+        }}
+      >
         {plan.features.map((f, i) => (
-          <li key={i} style={{ padding: "8px 0", fontSize: "0.9rem" }}>✓ {f}</li>
+          <li
+            key={i}
+            style={{
+              padding: "6px 0",
+              fontSize: "0.85rem",
+              display: "flex",
+              gap: 8,
+              alignItems: "flex-start",
+              opacity: plan.featured ? 1 : 0.85,
+            }}
+          >
+            <span
+              style={{
+                color: plan.featured ? "#3ECFCF" : "#2979D8",
+                fontWeight: 700,
+                flexShrink: 0,
+                marginTop: 1,
+              }}
+            >
+              ✓
+            </span>
+            {f}
+          </li>
         ))}
       </ul>
+
+      {/* CTA Button */}
       <button
         onClick={onSelect}
         onMouseEnter={() => setBtnHovered(true)}
         onMouseLeave={() => setBtnHovered(false)}
         style={{
           width: "100%",
-          padding: 14,
+          padding: "13px 0",
           borderRadius: 12,
-          background: plan.featured ? "#3ECFCF" : (btnHovered ? "#2979D8" : "transparent"),
-          color: plan.featured ? "#0A2540" : (btnHovered ? "#fff" : "#2979D8"),
+          background: plan.featured
+            ? "#3ECFCF"
+            : btnHovered
+            ? "#2979D8"
+            : "transparent",
+          color: plan.featured
+            ? "#0A2540"
+            : btnHovered
+            ? "#fff"
+            : "#2979D8",
           border: plan.featured ? "none" : "2px solid #2979D8",
           fontWeight: 700,
+          fontSize: "0.9rem",
           cursor: "pointer",
-          transition: "0.3s"
+          transition: "all 0.3s ease",
+          marginTop: "auto",
         }}
       >
         Book This Plan
@@ -183,15 +228,5 @@ const PricingCard: React.FC<{
     </div>
   );
 };
-
-/* --- Review Card Component --- */
-// const ReviewCard: React.FC<{ review: any; delay: number }> = ({ review, delay }) => {
-//   return (
-//     <div style={{ background: "rgba(255,255,255,0.07)", padding: 24, borderRadius: 18 }}>
-//       <p style={{ color: "#fff", fontStyle: "italic" }}>"{review.review}"</p>
-//       <div style={{ marginTop: 16, color: "#3ECFCF", fontWeight: 700 }}>{review.name}</div>
-//     </div>
-//   );
-// };
 
 export default Pricing;

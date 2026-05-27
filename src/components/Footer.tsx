@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
       </ul>
 
       <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.35)" }}>
-        © {new Date().getFullYear()} Wash For You. All rights reserved. 🌿
+        © {new Date().getFullYear()} Wash For U. All rights reserved. 🌿
       </div>
     </footer>
   );

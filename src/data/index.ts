@@ -84,56 +84,74 @@ export const SERVICES: ServiceItem[] = [
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
-    name: "Essential Clean",
-    tagline: "Perfect for quick, routine upkeep",
-    price: 399,
-    vehicleNote: "Hatchback / Sedan",
+    name: "Rapid Wash",
+    tagline: "Quick exterior refresh at your doorstep",
+    price: 299,
     features: [
-      "Doorstep service convenience",
-      "Exterior waterless wash (body surface cleaning)",
-      "Dust & light dirt removal",
-      "Tyre surface cleaning",
-      "Exterior glass cleaning (streak-free)",
+      "Doorstep service",
+      "Waterless exterior wash",
+      "Exterior polish",
+      "Tyre & rim polish",
     ],
   },
   {
-    name: "Interior Premium Deep Detailing",
-    tagline: "Deep interior cleaning & restoration",
-    price: 999,
-    vehicleNote: "Hatchback · ₹999 for Sedan · ₹1,299 for SUV",
+    name: "Basic Interior & Exterior Clean",
+    tagline: "A thorough clean inside and out",
+    price: 599,
     features: [
-      "Complete interior vacuuming (seats, carpets, boot)",
-      "Seat & upholstery deep cleaning (stain removal where possible)",
-      "Carpet & floor mat shampoo/clean",
-      "Dashboard, console & door panel detailing",
-      "AC vents & hard-to-reach area cleaning",
-      "Interior sanitization & odor removal",
-      "Interior glass cleaning (streak-free finish)",
+      "Doorstep service",
+      "Waterless exterior wash",
+      "Exterior polish",
+      "Tyre & rim polish",
+      "Glass polish",
+      "Semi interior vacuum",
+      "Door cleaning",
+      "Dashboard & seats dusting, cleaning & polish (3M foam)",
     ],
     featured: true,
   },
   {
-    name: "Ultimate Spa",
-    tagline: "The complete luxury experience",
-    price: 1999,
-    vehicleNote: "Hatchback · ₹1,999 Sedan · ₹2,299 SUV",
+    name: "Advance Interior & Exterior Clean",
+    tagline: "Deep clean with interior steam treatment",
+    price: 1299,
+    vehicleNote: "Provide max 1 bucket of water & electric point",
     features: [
-      "Everything in Interior Premium Deep Detailing",
-      "Engine bay Waterless clean",
-      "Paint decontamination prep",
-      "Ceramic spray coating",
-      "Leather conditioning",
-      "Priority scheduling",
+      "Doorstep service",
+      "Waterless exterior wash",
+      "Exterior polish",
+      "Tyre & rim polish",
+      "Glass polish",
+      "Interior vacuum",
+      "Door cleaning",
+      "Interior steam cleaning",
+      "Dashboard & seats dusting, cleaning & polish (3M foam)",
+      "Foot mat cleaning",
+    ],
+  },
+  {
+    name: "360 Wash",
+    tagline: "Complete exterior & interior deep clean",
+    price: 1999,
+    vehicleNote: "Provide max 1 bucket of water & electric point",
+    features: [
+      "Doorstep service",
+      "Waterless exterior wash",
+      "Exterior polish",
+      "Tyre & rim polish",
+      "Glass polish",
+      "Interior vacuum",
+      "Door cleaning",
+      "Interior steam cleaning",
+      "Dashboard & seats dusting, cleaning & polish (3M foam)",
+      "Foot mat cleaning",
+      "Roof cleaning",
+      "AC vent cleaning",
+      "Engine bay cleaning",
     ],
   },
 ];
 
-export const ADDONS: AddonItem[] = [
-  { emoji: "🔧", name: "Engine Bay Clean", price: 349 },
-  { emoji: "🪟", name: "Glass Polish", price: 199 },
-  { emoji: "🛡️", name: "Ceramic Spray", price: 499 },
-  { emoji: "🌸", name: "Ozone Odour Treatment", price: 249 },
-];
+export const ADDONS: AddonItem[] = [];
 
 export const CONTACT_INFO: ContactInfo[] = [
   {
@@ -148,13 +166,3 @@ export const CONTACT_INFO: ContactInfo[] = [
     value: "Jadavpur · Baghajatin · Garia · Dhakuria",
   },
 ];
-
-// ─── EmailJS Config ───────────────────────────────────────────
-// ⚠️ Replace these with your actual EmailJS credentials
-export const EMAILJS_CONFIG = {
-  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
-  templateToOwner: import.meta.env.VITE_EMAILJS_TEMPLATE_OWNER,
-  templateToUser: import.meta.env.VITE_EMAILJS_TEMPLATE_USER,
-  businessEmail: import.meta.env.VITE_EMAILJS_BUSINESS_EMAIL,
-} as const;

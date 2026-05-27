@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useInView, useEmailJS } from "../hooks";
-import { CONTACT_INFO, EMAILJS_CONFIG } from "../data";
+import { useInView } from "../hooks";
+import { CONTACT_INFO, PRICING_PLANS } from "../data";
 import type { BookingFormData, ToastState } from "../types";
 
 interface ContactProps {
@@ -8,12 +8,7 @@ interface ContactProps {
   onServiceConsumed?: () => void;
 }
 
-const SERVICES = [
-  "Essential Clean",
-  "Interior Premium Deep Detailing",
-  "Ultimate Spa",
-  "General Query",
-];
+const SERVICES = [...PRICING_PLANS.map((p) => p.name), "General Query"];
 const VEHICLES = ["Hatchback", "Sedan", "SUV / MUV", "Commercial Van"];
 
 // WhatsApp & Phone number (digits only, with country code)
@@ -84,8 +79,6 @@ const Contact: React.FC<ContactProps> = ({
   preselectedService,
   onServiceConsumed,
 }) => {
-  const emailJSReady = useEmailJS(EMAILJS_CONFIG.publicKey);
-
   useEffect(() => {
     const id = "contact-responsive-styles";
     if (document.getElementById(id)) return;
@@ -166,43 +159,39 @@ const Contact: React.FC<ContactProps> = ({
     }
 
     setSubmitting(true);
-    const payload = {
-      ...form,
-      to_email: EMAILJS_CONFIG.businessEmail,
-      business_name: "Wash For You",
-    };
 
-    if (emailJSReady) {
-      try {
-        const ejs = (window as any).emailjs;
-        await ejs.send(
-          EMAILJS_CONFIG.serviceId,
-          EMAILJS_CONFIG.templateToOwner,
-          payload,
-        );
-        await ejs.send(
-          EMAILJS_CONFIG.serviceId,
-          EMAILJS_CONFIG.templateToUser,
-          { ...payload, to_email: form.from_email },
-        );
-      } catch (err) {
-        console.error("EmailJS error:", err);
+    try {
+      const res = await fetch("/api/send-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Server error");
       }
-    }
 
-    window.open(buildWhatsAppURL(form), "_blank", "noopener,noreferrer");
-    showToast("✅ Booking sent! WhatsApp has opened.");
-    setForm({
-      from_name: "",
-      from_email: "",
-      phone: "",
-      service: "",
-      vehicle: "",
-      vehicleNumber: "",
-      preferred_date: "",
-      message: "",
-    });
-    setSubmitting(false);
+      window.open(buildWhatsAppURL(form), "_blank", "noopener,noreferrer");
+      showToast("✅ Booking confirmed! Email sent & WhatsApp has opened.");
+      setForm({
+        from_name: "",
+        from_email: "",
+        phone: "",
+        service: "",
+        vehicle: "",
+        vehicleNumber: "",
+        preferred_date: "",
+        message: "",
+      });
+    } catch (err: any) {
+      console.error("Booking error:", err);
+      showToast(`❌ Failed to send: ${err.message}. Use WhatsApp to book instead.`, true);
+      window.open(buildWhatsAppURL(form), "_blank", "noopener,noreferrer");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -578,7 +567,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
           className="form-service-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: 16,
           }}
         >
@@ -612,18 +601,16 @@ const BookingForm: React.FC<BookingFormProps> = ({
               ))}
             </FocusableSelect>
           </FormGroup>
-          <div className="form-vehicle-number">
-            <FormGroup label="Vehicle Number (Optional)">
-              <FocusableInput
-                type="text"
-                name="vehicleNumber"
-                value={form.vehicleNumber}
-                onChange={onChange}
-                placeholder="WB 06 AB 1234"
-              />
-            </FormGroup>
-          </div>
         </div>
+        <FormGroup label="Vehicle Number (Optional)">
+          <FocusableInput
+            type="text"
+            name="vehicleNumber"
+            value={form.vehicleNumber}
+            onChange={onChange}
+            placeholder="WB 06 AB 1234"
+          />
+        </FormGroup>
         <FormGroup label="Preferred Date & Time">
           <FocusableInput
             type="datetime-local"

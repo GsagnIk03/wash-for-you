@@ -48,13 +48,7 @@ const Services: React.FC = () => (
       </div>
     </div>
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        gap: 24,
-      }}
-    >
+    <div className="services-grid">
       {SERVICES.map((svc, i) => (
         <ServiceCard key={i} service={svc} delay={i * 80} />
       ))}

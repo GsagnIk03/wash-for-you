@@ -1,4 +1,4 @@
-# Wash For You — React TypeScript Landing Page
+# Wash For U — React TypeScript Landing Page
 
 Eco-Friendly Waterless Car Wash | Kolkata
 
