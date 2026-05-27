@@ -39,42 +39,42 @@ export const TIMELINE_ITEMS: TimelineItem[] = [
 
 export const SERVICES: ServiceItem[] = [
   {
-    icon: "💨",
+    icon: "🫧",
     title: "Exterior Waterless Wash",
     description:
       "High-temperature waterless jets blast away road grime, dust, bird droppings, and pollutants from every exterior surface — including under the wheel arches.",
     tag: "Most Popular",
   },
   {
-    icon: "🪑",
+    icon: "🪣",
     title: "Interior Deep Waterless Clean",
     description:
       "Waterless penetrates deep into upholstery, seat crevices, carpets, and floor mats — eliminating bacteria, allergens, and odours without soaking the fabric.",
     tag: "Hygienic",
   },
   {
-    icon: "✨",
+    icon: "⭐",
     title: "Full Car Detailing",
     description:
       "Our comprehensive package combines exterior waterless wash, interior deep clean, dashboard polish, tyre dressing, and a streak-free glass treatment.",
     tag: "Premium",
   },
   {
-    icon: "🔧",
+    icon: "⚙️",
     title: "Engine Bay Waterless Clean",
     description:
       "Safe, controlled waterless cleaning of your engine bay removes accumulated grease and oil deposits — improving heat dissipation and giving your engine a factory-fresh look.",
     tag: "Specialised",
   },
   {
-    icon: "🛞",
+    icon: "🔩",
     title: "Tyre & Alloy Wheel Clean",
     description:
       "Stubborn brake dust and kerb grime are no match for our waterless jets. Alloy wheels are cleaned and dressed to restore their original shine safely.",
     tag: "Add-on Available",
   },
   {
-    icon: "🚐",
+    icon: "🚙",
     title: "SUV & Commercial Wash",
     description:
       "Dedicated waterless wash packages for SUVs, MPVs, and commercial vehicles with extended reach equipment and reinforced cleaning protocols.",
