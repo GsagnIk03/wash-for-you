@@ -91,11 +91,15 @@ const HistoryCard: React.FC = () => (
         borderRadius: 14,
         boxShadow: "0 8px 32px rgba(10,37,64,0.14)",
         textAlign: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 2,
       }}
     >
-      🌿 Est. 2026
-      <br />
-      Kolkata
+      <span style={{ fontSize: "1.1rem" }}>🌿</span>
+      <span>Est. 2026</span>
+      <span>Kolkata</span>
     </div>
   </div>
 );

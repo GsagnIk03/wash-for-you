@@ -214,9 +214,6 @@ a {
   .form-service-grid {
     grid-template-columns: 1fr 1fr !important;
   }
-  .form-vehicle-number {
-    grid-column: 1 / -1 !important;
-  }
 }
 
 /* ── Mobile: ≤ 600px ── */
@@ -233,8 +230,5 @@ a {
   .form-service-grid {
     grid-template-columns: 1fr !important;
     gap: 0 !important;
-  }
-  .form-vehicle-number {
-    grid-column: 1 / -1 !important;
   }
 }

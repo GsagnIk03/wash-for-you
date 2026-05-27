@@ -137,7 +137,7 @@ const Hero: React.FC = () => {
             marginBottom: 28,
           }}
         >
-          🌿 Kolkata's Premier Eco-Friendly Car Wash — Wash For You
+          🌿 Kolkata's Premier Eco-Friendly Car Wash — Wash For U
         </div>
 
         <h1

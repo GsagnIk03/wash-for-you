@@ -18,7 +18,7 @@ export interface PricingPlan {
   name: string;
   tagline: string;
   price: number;
-  vehicleNote: string;
+  vehicleNote?: string;
   features: string[];
   featured?: boolean;
 }
