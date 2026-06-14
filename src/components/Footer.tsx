@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
           color: "#fff",
         }}
       >
-        Wash For <span style={{ color: "#3ECFCF" }}>You</span> — Kolkata
+        Wash For <span style={{ color: "#3ECFCF" }}>U </span> — Kolkata
       </div>
 
       <ul
@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
       </ul>
 
       <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.35)" }}>
-        © {new Date().getFullYear()} Wash For U. All rights reserved. 🌿
+        © {new Date().getFullYear()} Wash For U. All rights reserved.
       </div>
     </footer>
   );

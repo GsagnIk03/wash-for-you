@@ -18,9 +18,11 @@ export interface PricingPlan {
   name: string;
   tagline: string;
   price: number;
+  originalPrice: number;
   vehicleNote?: string;
   features: string[];
   featured?: boolean;
+  isBike?: boolean;
 }
 
 export interface AddonItem {
@@ -42,7 +44,8 @@ export interface BookingFormData {
   from_email: string;
   phone: string;
   service: string;
-  vehicle: string;
+  vehicle: string; // car vehicle type OR bike type (Bike / Scooty)
+  vehicleModel: string; // new field — always present
   vehicleNumber: string;
   preferred_date: string;
   message: string;

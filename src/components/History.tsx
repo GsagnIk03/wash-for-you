@@ -4,14 +4,20 @@ import { TIMELINE_ITEMS } from "../data";
 import type { TimelineItem } from "../types";
 
 const History: React.FC = () => (
-  <section id="history" style={{ padding: "100px 5%", background: "#fff" }}>
+  <section
+    id="history"
+    style={{
+      padding: "100px 5%",
+      background: "#F3F8FF",
+      boxSizing: "border-box",
+    }}
+  >
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-        gap: 80,
+        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        gap: 60,
         alignItems: "center",
-        marginTop: 0,
       }}
     >
       <HistoryCard />
@@ -44,7 +50,7 @@ const HistoryCard: React.FC = () => (
           pointerEvents: "none",
         }}
       >
-        💧
+        🚗
       </div>
 
       <div
@@ -70,10 +76,9 @@ const HistoryCard: React.FC = () => (
           color: "rgba(255,255,255,0.75)",
         }}
       >
-        Built with a vision for sustainable car care, our waterless washing
-        service focuses on efficiency, convenience, and reduced environmental
-        impact. We’ve started our operations across Jadavpur, Baghajatin, Garia,
-        and Dhakuria, bringing eco-friendly cleaning closer to home.
+        Built on a simple promise — professional car and bike care that comes to
+        you. We started operations across Jadavpur, Baghajatin, Garia, and
+        Dhakuria, bringing quality doorstep washing closer to home.
       </p>
     </div>
 
@@ -91,13 +96,13 @@ const HistoryCard: React.FC = () => (
         borderRadius: 14,
         boxShadow: "0 8px 32px rgba(10,37,64,0.14)",
         textAlign: "center",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 2,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 2,
       }}
     >
-      <span style={{ fontSize: "1.1rem" }}>🌿</span>
+      <span style={{ fontSize: "1.1rem" }}>📍</span>
       <span>Est. 2026</span>
       <span>Kolkata</span>
     </div>
@@ -110,11 +115,12 @@ const Timeline: React.FC = () => (
     <h2 className="section-title">
       A Story Built on
       <br />
-      Green Innovation
+      Trust & Consistency
     </h2>
     <p className="section-sub" style={{ marginBottom: 36 }}>
-      We’re a growing waterless car care service in South Kolkata, focused on
-      doing things right — less water, better care, and consistent results.
+      We're a growing car and bike wash service in South Kolkata, focused on
+      doing things right — professional equipment, punctual service, and
+      consistent results.
     </p>
     {TIMELINE_ITEMS.map((item, i) => (
       <TimelineRow key={i} item={item} delay={i * 100} />

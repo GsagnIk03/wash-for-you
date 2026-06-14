@@ -240,3 +240,19 @@ input[type="datetime-local"] {
   appearance: none;
   font-size: 0.85rem;
 }
+/* ─── Shimmer animation (promo banner) ──────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* ─── Services grid (auto-fit) ──────────────────────────────── */
+@media (max-width: 600px) {
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
