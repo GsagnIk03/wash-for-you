@@ -13,17 +13,11 @@ const HERO_CSS = `
     pointer-events: none;
     animation: heroFadeUp 1.1s 0.25s ease both;
   }
-  /* Tablet: Keep side-by-side but shrink and fade slightly to prevent overlap */
   @media (min-width: 601px) and (max-width: 1024px) {
-    .hero-section {
-      padding: 120px 5% 80px !important;
-    }
+    .hero-section { padding: 120px 5% 80px !important; }
     .hero-illustration {
       width: 42% !important;
       right: -2% !important;
-      top: 50% !important;
-      bottom: auto !important;
-      transform: translateY(-50%) !important;
       opacity: 0.5 !important;
     }
     .hero-content {
@@ -32,24 +26,26 @@ const HERO_CSS = `
       z-index: 5 !important;
     }
   }
-  /* Mobile: hide illustration entirely */
   @media (max-width: 600px) {
-    .hero-illustration {
-      display: none !important;
+    .hero-illustration { display: none !important; }
+    .hero-section { padding: 100px 5% 64px !important; }
+    .hero-content { max-width: 100% !important; }
+    .hero-cta-row { flex-direction: column !important; }
+    .hero-cta-row button {
+      width: 100% !important;
+      justify-content: center !important;
+      box-sizing: border-box !important;
     }
-    .hero-section {
-      padding: 100px 5% 64px !important;
-    }
-    .hero-content {
-      max-width: 100% !important;
-    }
-    .hero-stats {
-      gap: 24px !important;
-    }
+    .hero-stats { gap: 24px !important; }
+    .hero-promo-banner { font-size: 0.75rem !important; padding: 7px 14px !important; }
   }
 `;
 
-const Hero: React.FC = () => {
+interface HeroProps {
+  onOpenBooking: () => void;
+}
+
+const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
@@ -120,6 +116,33 @@ const Hero: React.FC = () => {
           animation: "heroFadeUp 0.9s ease both",
         }}
       >
+        {/* Promo Banner — in flow, not absolute */}
+        <div
+          className="hero-promo-banner"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            background: "linear-gradient(90deg, #3ECFCF, #2979D8, #3ECFCF)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 3s linear infinite",
+            borderRadius: 50,
+            padding: "8px 18px",
+            fontSize: "0.8rem",
+            fontWeight: 700,
+            color: "#fff",
+            letterSpacing: "0.03em",
+            boxShadow: "0 4px 20px rgba(62,207,207,0.4)",
+            marginBottom: 20,
+            maxWidth: "100%",
+            boxSizing: "border-box",
+            flexWrap: "wrap",
+          }}
+        >
+          🎉 10% OFF on all bookings — Limited offer till 31st December 2026!
+        </div>
+
+        {/* Badge */}
         <div
           style={{
             display: "inline-flex",
@@ -128,16 +151,19 @@ const Hero: React.FC = () => {
             background: "rgba(62,207,207,0.18)",
             border: "1px solid rgba(62,207,207,0.4)",
             color: "#3ECFCF",
-            fontSize: "0.8rem",
+            fontSize: "0.78rem",
             fontWeight: 600,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             padding: "6px 16px",
             borderRadius: 50,
-            marginBottom: 28,
+            marginBottom: 24,
+            maxWidth: "100%",
+            boxSizing: "border-box",
+            flexWrap: "wrap",
           }}
         >
-          🌿 Kolkata's Premier Eco-Friendly Car Wash — Wash For U
+          🚗 Kolkata's Premier Doorstep Car &amp; Bike Wash — Wash For U
         </div>
 
         <h1
@@ -150,7 +176,7 @@ const Hero: React.FC = () => {
             marginBottom: 24,
           }}
         >
-          Waterless.
+          Professional.
           <br />
           <span
             style={{
@@ -159,53 +185,67 @@ const Hero: React.FC = () => {
               WebkitTextFillColor: "transparent",
             }}
           >
-            Zero Waste.
+            Doorstep.
           </span>
           <br />
-          Spotless Cleaning.
+          Spotless Clean.
         </h1>
 
         <p
           style={{
-            fontSize: "1.1rem",
+            fontSize: "1.05rem",
             lineHeight: 1.75,
             color: "rgba(255,255,255,0.72)",
-            marginBottom: 40,
-            maxWidth: 520,
+            marginBottom: 14,
+            maxWidth: 480,
           }}
         >
-          We harness the power of waterless car wash service to deliver a deep,
-          extravagant cleaning for your vehicle, saving up to 95% water compared
-          to traditional washing. Good for your car, great for the planet.
+          We bring high-pressure wash equipment to your home, delivering a deep,
+          thorough clean for your car or bike — right where you park it.
         </p>
 
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <p
+          style={{
+            fontSize: "0.85rem",
+            color: "rgba(62,207,207,0.9)",
+            marginBottom: 36,
+            fontWeight: 500,
+          }}
+        >
+          📌 Customers provide water &amp; an electric point for our pressure
+          washer.
+        </p>
+
+        <div
+          className="hero-cta-row"
+          style={{ display: "flex", gap: 14, flexWrap: "wrap" }}
+        >
           <HeroButton
             primary
-            onClick={() => scrollTo("contact")}
+            onClick={onOpenBooking}
             label="📅 Book a Service"
           />
           <HeroButton
-            onClick={() => scrollTo("services")}
-            label="Explore Services →"
+            onClick={() => scrollTo("pricing")}
+            label="View Pricing →"
           />
         </div>
 
-        {/* Stats
+        {/* Stats */}
         <div
           className="hero-stats"
-          style={{ display: "flex", gap: 40, marginTop: 56, flexWrap: "wrap" }}
+          style={{ display: "flex", gap: 36, marginTop: 48, flexWrap: "wrap" }}
         >
           {[
-            { num: "95%", label: "Water Saved" },
-            { num: "50+", label: "Cars Washed" },
-            { num: "100%", label: "Chemical-Free" },
+            { num: "₹149", label: "Bike Wash Starts At" },
+            { num: "₹299", label: "Car Wash Starts At" },
+            { num: "10%", label: "Launch Discount" },
           ].map((s) => (
             <div key={s.label}>
               <div
                 style={{
                   fontFamily: "'Playfair Display', serif",
-                  fontSize: "2rem",
+                  fontSize: "1.9rem",
                   fontWeight: 900,
                   color: "#fff",
                 }}
@@ -214,7 +254,7 @@ const Hero: React.FC = () => {
               </div>
               <div
                 style={{
-                  fontSize: "0.82rem",
+                  fontSize: "0.78rem",
                   color: "rgba(255,255,255,0.55)",
                   marginTop: 2,
                 }}
@@ -223,7 +263,7 @@ const Hero: React.FC = () => {
               </div>
             </div>
           ))}
-        </div> */}
+        </div>
       </div>
 
       {/* SVG Illustration */}
@@ -266,6 +306,7 @@ const HeroButton: React.FC<{
           ? "0 14px 36px rgba(62,207,207,0.5)"
           : "0 8px 28px rgba(62,207,207,0.4)",
         transform: hovered ? "translateY(-3px)" : "none",
+        border: "none",
       }
     : {
         border: `2px solid ${hovered ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)"}`,
@@ -290,7 +331,6 @@ const HeroButton: React.FC<{
         cursor: "pointer",
         fontFamily: "'DM Sans', sans-serif",
         transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
-        border: primary ? "none" : undefined,
       }}
     >
       {label}

@@ -8,12 +8,12 @@ const Services: React.FC = () => (
     id="services"
     style={{
       padding: "100px 5%",
-      background: "#F3F8FF",
+      background: "linear-gradient(160deg, #0A2540 0%, #0F3875 100%)",
       position: "relative",
       overflow: "hidden",
     }}
   >
-    {/* Background glow */}
+    {/* Background decoration */}
     <div
       style={{
         position: "absolute",
@@ -23,61 +23,84 @@ const Services: React.FC = () => (
         height: 600,
         borderRadius: "50%",
         background:
-          "radial-gradient(circle, rgba(41,121,216,0.07) 0%, transparent 70%)",
+          "radial-gradient(circle, rgba(62,207,207,0.07) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        bottom: -150,
+        left: -150,
+        width: 500,
+        height: 500,
+        borderRadius: "50%",
+        background:
+          "radial-gradient(circle, rgba(41,121,216,0.1) 0%, transparent 70%)",
         pointerEvents: "none",
       }}
     />
 
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-end",
-        justifyContent: "space-between",
-        marginBottom: 56,
-        flexWrap: "wrap",
-        gap: 24,
-      }}
-    >
-      <div>
-        <div className="section-label">What We Offer</div>
-        <h2 className="section-title">Our Services</h2>
-        <p className="section-sub">
-          Every service uses excellent waterless mechanism — minimal water,
-          maximum cleanliness.
+    <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ marginBottom: 56 }}>
+        <div className="section-label" style={{ color: "#3ECFCF" }}>
+          What We Offer
+        </div>
+        <h2 className="section-title" style={{ color: "#fff" }}>
+          Our Services
+        </h2>
+        <p className="section-sub" style={{ color: "rgba(255,255,255,0.65)" }}>
+          Professional doorstep wash for cars and bikes — high-pressure clean,
+          right where you park.
         </p>
       </div>
-    </div>
 
-    <div className="services-grid">
-      {SERVICES.map((svc, i) => (
-        <ServiceCard key={i} service={svc} delay={i * 80} />
-      ))}
+      <ServicesGrid />
     </div>
   </section>
 );
 
-const ServiceCard: React.FC<{ service: ServiceItem; delay: number }> = ({
-  service,
-  delay,
-}) => {
+const ServicesGrid: React.FC = () => {
   const [ref, inView] = useInView<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        gap: 24,
+      }}
+    >
+      {SERVICES.map((svc, i) => (
+        <ServiceCard key={i} service={svc} delay={i * 80} inView={inView} />
+      ))}
+    </div>
+  );
+};
+
+const ServiceCard: React.FC<{
+  service: ServiceItem;
+  delay: number;
+  inView: boolean;
+}> = ({ service, delay, inView }) => {
   const [hovered, setHovered] = React.useState(false);
 
   return (
     <div
-      ref={ref}
       className={`fade-up${inView ? " visible" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: "#fff",
-        borderRadius: 16,
-        padding: "36px 28px",
+        background: hovered
+          ? "rgba(255,255,255,0.12)"
+          : "rgba(255,255,255,0.06)",
         border: hovered
-          ? "1px solid transparent"
-          : "1px solid rgba(41,121,216,0.1)",
-        boxShadow: hovered ? "0 20px 60px rgba(10,37,64,0.18)" : "none",
-        transform: hovered ? "translateY(-8px)" : "none",
+          ? "1px solid rgba(62,207,207,0.4)"
+          : "1px solid rgba(255,255,255,0.1)",
+        borderRadius: 16,
+        padding: "32px 28px",
+        boxShadow: hovered ? "0 20px 60px rgba(0,0,0,0.25)" : "none",
+        transform: hovered ? "translateY(-6px)" : "none",
         transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
         position: "relative",
         overflow: "hidden",
@@ -85,37 +108,37 @@ const ServiceCard: React.FC<{ service: ServiceItem; delay: number }> = ({
         transitionDelay: `${delay}ms`,
       }}
     >
-      {/* Bottom bar */}
+      {/* Left accent bar */}
       <div
         style={{
           position: "absolute",
-          bottom: 0,
           left: 0,
-          right: 0,
-          height: 4,
-          background: "linear-gradient(90deg, #2979D8, #3ECFCF)",
-          transform: hovered ? "scaleX(1)" : "scaleX(0)",
-          transformOrigin: "left",
-          transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)",
+          top: "20%",
+          bottom: "20%",
+          width: 3,
+          background: hovered
+            ? "linear-gradient(180deg, #3ECFCF, #2979D8)"
+            : "transparent",
+          borderRadius: "0 4px 4px 0",
+          transition: "all 0.35s ease",
         }}
       />
 
       {/* Icon */}
       <div
         style={{
-          width: 58,
-          height: 58,
+          width: 56,
+          height: 56,
           background: hovered
-            ? "linear-gradient(135deg, #2979D8, #1A4F8A)"
-            : "#E8F1FB",
-          borderRadius: 16,
+            ? "rgba(62,207,207,0.25)"
+            : "rgba(255,255,255,0.1)",
+          borderRadius: 14,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "1.7rem",
-          marginBottom: 22,
-          transform: hovered ? "scale(1.1) rotate(-5deg)" : "none",
-          transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
+          fontSize: "1.6rem",
+          marginBottom: 20,
+          transition: "all 0.35s ease",
         }}
       >
         {service.icon}
@@ -124,15 +147,21 @@ const ServiceCard: React.FC<{ service: ServiceItem; delay: number }> = ({
       <h3
         style={{
           fontFamily: "'Playfair Display', serif",
-          fontSize: "1.15rem",
+          fontSize: "1.1rem",
           fontWeight: 700,
           marginBottom: 10,
-          color: "#0A2540",
+          color: "#fff",
         }}
       >
         {service.title}
       </h3>
-      <p style={{ fontSize: "0.88rem", lineHeight: 1.75, color: "#4A6FA5" }}>
+      <p
+        style={{
+          fontSize: "0.87rem",
+          lineHeight: 1.75,
+          color: "rgba(255,255,255,0.65)",
+        }}
+      >
         {service.description}
       </p>
       <span
@@ -141,8 +170,9 @@ const ServiceCard: React.FC<{ service: ServiceItem; delay: number }> = ({
           marginTop: 16,
           fontSize: "0.75rem",
           fontWeight: 600,
-          color: "#2979D8",
-          background: "#E8F1FB",
+          color: "#3ECFCF",
+          background: "rgba(62,207,207,0.15)",
+          border: "1px solid rgba(62,207,207,0.3)",
           padding: "4px 12px",
           borderRadius: 50,
         }}

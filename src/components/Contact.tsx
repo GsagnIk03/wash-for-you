@@ -135,7 +135,7 @@ const Contact: React.FC<ContactProps> = ({
 
   const buildWhatsAppURL = (f: BookingFormData) => {
     const lines = [
-      `🚗 *New Booking — Wash For You*`,
+      `🚗 *New Booking — Wash For U*`,
       ``,
       `👤 *Name:* ${f.from_name}`,
       `📞 *Phone:* ${f.phone}`,
@@ -187,7 +187,10 @@ const Contact: React.FC<ContactProps> = ({
       });
     } catch (err: any) {
       console.error("Booking error:", err);
-      showToast(`❌ Failed to send: ${err.message}. Use WhatsApp to book instead.`, true);
+      showToast(
+        `❌ Failed to send: ${err.message}. Use WhatsApp to book instead.`,
+        true,
+      );
       window.open(buildWhatsAppURL(form), "_blank", "noopener,noreferrer");
     } finally {
       setSubmitting(false);
