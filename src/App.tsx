@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import Pricing from "./components/Pricing";
 import Services from "./components/Services";
 import History from "./components/History";
+import Gallery from "./components/Gallery";
 import ContactStrip from "./components/ContactStrip";
 import Footer from "./components/Footer";
 import BookingModal from "./components/BookingModal";
@@ -36,10 +37,10 @@ const App: React.FC = () => {
         <Pricing onSelectPlan={handleSelectPlan} />
         <Services />
         <History />
+        <Gallery />
         <ContactStrip />
       </main>
       <Footer />
-
       <BookingModal
         isOpen={modalOpen}
         onClose={handleCloseModal}
