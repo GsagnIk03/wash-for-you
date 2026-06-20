@@ -22,8 +22,10 @@ const Footer: React.FC = () => {
       document.getElementById(id)?.remove();
     };
   }, []);
-  const scrollTo = (id: string) =>
+  const scrollTo = (id: string) => {
+    history.replaceState(null, "", `#${id}`);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const links = [
     { label: "Our Story", id: "history" },
@@ -109,7 +111,7 @@ const Footer: React.FC = () => {
         }}
       >
         <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.35)" }}>
-          © {new Date().getFullYear()} Wash For You. All rights reserved.
+          © {new Date().getFullYear()} Wash For U. All rights reserved.
         </div>
         <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.35)" }}>
           South Kolkata · Jadavpur · Baghajatin · Garia · Dhakuria

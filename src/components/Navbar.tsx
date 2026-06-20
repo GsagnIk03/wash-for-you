@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useScrolled } from "../hooks";
-import logoImg from "../logo_final.png";
+import logoImg from "../logo_final.jpeg";
 
 const NAVBAR_CSS = `
   html {
@@ -124,6 +124,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
 
   const scrollTo = (id: string) => {
     setMenuOpen(false);
+    history.replaceState(null, "", `#${id}`);
     setTimeout(() => {
       document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     }, 50);

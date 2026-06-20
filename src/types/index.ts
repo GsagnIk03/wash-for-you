@@ -19,6 +19,7 @@ export interface PricingPlan {
   tagline: string;
   price: number;
   originalPrice: number;
+  suvSurcharge?: number; // extra charge for SUV/MUV
   vehicleNote?: string;
   features: string[];
   featured?: boolean;
@@ -44,10 +45,11 @@ export interface BookingFormData {
   from_email: string;
   phone: string;
   service: string;
-  vehicle: string; // car vehicle type OR bike type (Bike / Scooty)
-  vehicleModel: string; // new field — always present
+  vehicle: string;
+  vehicleModel: string;
   vehicleNumber: string;
   preferred_date: string;
+  price: string; // final price including surcharge
   message: string;
 }
 

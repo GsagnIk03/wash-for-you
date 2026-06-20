@@ -82,7 +82,6 @@ export const SERVICES: ServiceItem[] = [
   },
 ];
 
-// Helper to compute original price (price is the discounted rate; original = price / 0.9)
 const orig = (discounted: number) => Math.round(discounted / 0.9);
 
 export const PRICING_PLANS: PricingPlan[] = [
@@ -91,6 +90,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     tagline: "Quick exterior refresh at your doorstep",
     price: 299,
     originalPrice: orig(299),
+    suvSurcharge: 50,
     features: [
       "Doorstep service",
       "Pressure exterior wash",
@@ -103,6 +103,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     tagline: "A thorough clean inside and out",
     price: 599,
     originalPrice: orig(599),
+    suvSurcharge: 100,
     features: [
       "Doorstep service",
       "Pressure exterior wash",
@@ -120,6 +121,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     tagline: "Deep clean with full interior steam treatment",
     price: 1299,
     originalPrice: orig(1299),
+    suvSurcharge: 200,
     features: [
       "Doorstep service",
       "Pressure exterior wash",
