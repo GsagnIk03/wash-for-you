@@ -46,8 +46,10 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
-  const scrollTo = (id: string) =>
+  const scrollTo = (id: string) => {
+    history.replaceState(null, "", `#${id}`);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const id = "hero-responsive-styles";

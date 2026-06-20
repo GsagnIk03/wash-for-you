@@ -10,6 +10,7 @@ interface BookingPayload {
   vehicle: string;
   vehicleModel?: string;
   vehicleNumber?: string;
+  price?: string;
   preferred_date?: string;
   message?: string;
 }
@@ -77,6 +78,7 @@ module.exports = async function handler(req: any, res: any) {
     vehicle,
     vehicleModel,
     vehicleNumber,
+    price,
     preferred_date,
     message,
   } = payload;
@@ -111,6 +113,7 @@ module.exports = async function handler(req: any, res: any) {
           <tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">${isBike ? "🛵" : "🚙"} Vehicle Type</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 600; color: #0A2540;">${vehicleTypeLabel}</td></tr>
           ${vehicleModel ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">📋 Vehicle Model</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 600; color: #0A2540;">${vehicleModel}</td></tr>` : ""}
           ${vehicleNumber ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">🔢 Vehicle Number</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 600; color: #0A2540;">${vehicleNumber}</td></tr>` : ""}
+          ${price ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">💰 Price</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 700; color: #2979D8; font-size: 15px;">${price}</td></tr>` : ""}
           <tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">📅 Preferred Date & Time</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 600; color: #0A2540;">${dateFormatted}</td></tr>
           ${message ? `<tr><td style="padding: 10px 0; color: #4A6FA5; font-size: 13px;">📝 Notes</td><td style="padding: 10px 0; font-weight: 600; color: #0A2540;">${message}</td></tr>` : ""}
         </table>
@@ -134,6 +137,7 @@ module.exports = async function handler(req: any, res: any) {
         <table style="width: 100%; border-collapse: collapse;">
           <tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px; width: 40%;">🧽 Service</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 600; color: #2979D8;">${service}</td></tr>
           <tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">${isBike ? "🛵" : "🚙"} Vehicle</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 600; color: #0A2540;">${vehicleTypeLabel}${vehicleModel ? ` — ${vehicleModel}` : ""}${vehicleNumber ? ` (${vehicleNumber})` : ""}</td></tr>
+          ${price ? `<tr><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; color: #4A6FA5; font-size: 13px;">💰 Price</td><td style="padding: 10px 0; border-bottom: 1px solid #e8f1fb; font-weight: 700; color: #2979D8; font-size: 15px;">${price}</td></tr>` : ""}
           <tr><td style="padding: 10px 0; color: #4A6FA5; font-size: 13px;">📅 Preferred Date</td><td style="padding: 10px 0; font-weight: 600; color: #0A2540;">${dateFormatted}</td></tr>
         </table>
         <div style="margin-top: 24px; background: #e8f7f0; border: 1px solid #27AE60; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #1A7245;">

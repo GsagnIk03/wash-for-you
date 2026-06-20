@@ -6,10 +6,23 @@ const ALL_PLANS = [...PRICING_PLANS, BIKE_PLAN];
 const SERVICES = [...ALL_PLANS.map((p) => p.name), "General Query"];
 const CAR_VEHICLES = ["Hatchback", "Sedan", "SUV / MUV", "Commercial Van"];
 const BIKE_TYPES = ["Bike", "Scooty"];
+const SUV_VEHICLE = "SUV / MUV";
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 const isBikeService = (service: string) => service === BIKE_PLAN.name;
+
+// Compute final price based on service + vehicle type
+const computePrice = (service: string, vehicle: string): string => {
+  if (!service || service === "General Query") return "";
+  const plan = ALL_PLANS.find((p) => p.name === service);
+  if (!plan) return "";
+  let price = plan.price;
+  if (vehicle === SUV_VEHICLE && plan.suvSurcharge) {
+    price += plan.suvSurcharge;
+  }
+  return `₹${price}`;
+};
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -26,82 +39,35 @@ const inputStyle: React.CSSProperties = {
 };
 
 const MODAL_CSS = `
-  .modal-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10,37,64,0.75);
-    backdrop-filter: blur(6px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    position: fixed; inset: 0; background: rgba(10,37,64,0.75);
+    backdrop-filter: blur(6px); z-index: 1000; display: flex;
+    align-items: center; justify-content: center; padding: 20px;
     animation: fadeInOverlay 0.25s ease;
   }
   .modal-box {
-    background: #fff;
-    border-radius: 24px;
-    width: 100%;
-    max-width: 640px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 32px 80px rgba(10,37,64,0.35);
+    background: #fff; border-radius: 24px; width: 100%; max-width: 640px;
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(10,37,64,0.35);
     animation: slideUpModal 0.3s cubic-bezier(0.4,0,0.2,1);
-    scrollbar-width: thin;
-    scrollbar-color: #2979D8 #F3F8FF;
+    scrollbar-width: thin; scrollbar-color: #2979D8 #F3F8FF;
   }
   .modal-box::-webkit-scrollbar { width: 5px; }
   .modal-box::-webkit-scrollbar-track { background: #F3F8FF; }
   .modal-box::-webkit-scrollbar-thumb { background: #2979D8; border-radius: 3px; }
-  .modal-header {
-    position: sticky;
-    top: 0;
-    background: #fff;
-    z-index: 10;
-    padding: 28px 32px 20px;
-    border-bottom: 1px solid rgba(41,121,216,0.1);
-  }
+  .modal-header { position: sticky; top: 0; background: #fff; z-index: 10; padding: 28px 32px 20px; border-bottom: 1px solid rgba(41,121,216,0.1); }
   .modal-body { padding: 24px 32px 32px; }
-  .bike-type-group {
-    display: flex;
-    gap: 12px;
-  }
+  .bike-type-group { display: flex; gap: 12px; }
   .bike-type-btn {
-    flex: 1;
-    padding: 10px 0;
-    border-radius: 10px;
-    border: 1.5px solid rgba(41,121,216,0.2);
-    background: #F3F8FF;
-    color: #4A6FA5;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    flex: 1; padding: 10px 0; border-radius: 10px;
+    border: 1.5px solid rgba(41,121,216,0.2); background: #F3F8FF; color: #4A6FA5;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
   }
-  .bike-type-btn.active {
-    background: #2979D8;
-    border-color: #2979D8;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(41,121,216,0.3);
-  }
-  @keyframes fadeInOverlay {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  @keyframes slideUpModal {
-    from { opacity: 0; transform: translateY(24px) scale(0.97); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
+  .bike-type-btn.active { background: #2979D8; border-color: #2979D8; color: #fff; box-shadow: 0 4px 12px rgba(41,121,216,0.3); }
+  @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUpModal { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @media (max-width: 600px) {
     .modal-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
     .modal-header { padding: 20px 20px 16px; }
@@ -128,6 +94,7 @@ const EMPTY_FORM: BookingFormData = {
   vehicleModel: "",
   vehicleNumber: "",
   preferred_date: "",
+  price: "",
   message: "",
 };
 
@@ -162,20 +129,26 @@ const BookingModal: React.FC<BookingModalProps> = ({
   // Preselect plan from pricing card click
   useEffect(() => {
     if (preselectedService) {
+      const price = computePrice(preselectedService, "");
       setForm((f) => ({
         ...f,
         service: preselectedService,
-        // reset vehicle when service changes
         vehicle: "",
+        price,
       }));
       onServiceConsumed?.();
     }
   }, [preselectedService]);
 
-  // When service switches between bike/car, reset vehicle field
+  // Reset vehicle when switching between bike/car
   useEffect(() => {
-    setForm((f) => ({ ...f, vehicle: "" }));
+    setForm((f) => ({ ...f, vehicle: "", price: computePrice(f.service, "") }));
   }, [bikeSelected]);
+
+  // Recompute price when vehicle changes
+  useEffect(() => {
+    setForm((f) => ({ ...f, price: computePrice(f.service, f.vehicle) }));
+  }, [form.vehicle, form.service]);
 
   // Lock body scroll
   useEffect(() => {
@@ -214,6 +187,11 @@ const BookingModal: React.FC<BookingModalProps> = ({
     }
   };
 
+  // Get the plan's surcharge info for display
+  const selectedPlan = ALL_PLANS.find((p) => p.name === form.service);
+  const isSUV = form.vehicle === SUV_VEHICLE;
+  const surcharge = selectedPlan?.suvSurcharge;
+
   const buildWhatsAppURL = (f: BookingFormData) => {
     const vehicleLabel = isBikeService(f.service)
       ? `${f.vehicle} (Bike Wash)`
@@ -229,6 +207,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
       `🚙 Vehicle: ${vehicleLabel}`,
       `📋 Model: ${f.vehicleModel || "Not specified"}`,
       `🔢 Number: ${f.vehicleNumber || "Not specified"}`,
+      `💰 Price: ${f.price || "To be confirmed"}`,
       `📅 Date & Time: ${f.preferred_date || "Not specified"}`,
       `📝 Notes: ${f.message || "None"}`,
     ];
@@ -258,7 +237,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-
       let data: any = {};
       try {
         data = await res.json();
@@ -267,12 +245,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
           "Server returned an invalid response. Please try again.",
         );
       }
-
-      if (!res.ok) {
+      if (!res.ok)
         throw new Error(data.error || `Server error (${res.status})`);
-      }
-
-      // ✅ Success — capture form data before resetting, then show message and open WhatsApp
       const submittedForm = { ...form };
       showToast("✅ Booking confirmed! Opening WhatsApp now…");
       setForm(EMPTY_FORM);
@@ -345,15 +319,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 fontSize: "1.1rem",
                 color: "#4A6FA5",
                 flexShrink: 0,
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "#E8F1FB";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "#F3F8FF";
               }}
               aria-label="Close modal"
             >
@@ -407,7 +372,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
         {/* Body */}
         <div className="modal-body">
           <form onSubmit={handleSubmit}>
-            {/* Name + Phone */}
             <div className="modal-grid">
               <FormGroup label="Full Name *">
                 <FocusInput
@@ -431,7 +395,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </FormGroup>
             </div>
 
-            {/* Email */}
             <FormGroup label="Email Address *">
               <FocusInput
                 type="email"
@@ -443,7 +406,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
               />
             </FormGroup>
 
-            {/* Service */}
             <FormGroup label="Service Required *">
               <FocusSelect
                 name="service"
@@ -487,7 +449,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </div>
             )}
 
-            {/* Vehicle field — conditional */}
+            {/* Vehicle field */}
             {bikeSelected ? (
               <FormGroup label="Two-Wheeler Type *">
                 <div className="bike-type-group">
@@ -521,8 +483,69 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </FormGroup>
             )}
 
-            {/* Vehicle Model — always shown */}
-            <FormGroup label="Vehicle Model *">
+            {/* SUV surcharge notice */}
+            {isSUV && surcharge && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  background: "#fff7ed",
+                  border: "1.5px solid #fed7aa",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  marginBottom: 16,
+                  fontSize: "0.82rem",
+                  color: "#92400e",
+                  lineHeight: 1.5,
+                }}
+              >
+                <span style={{ flexShrink: 0 }}>🚙</span>
+                <span>
+                  SUV / MUV surcharge of <strong>+₹{surcharge}</strong> applies
+                  for this plan.
+                </span>
+              </div>
+            )}
+
+            {/* Price display */}
+            {form.price && (
+              <div
+                style={{
+                  background: "linear-gradient(135deg, #EFF6FF, #F3F8FF)",
+                  border: "2px solid #2979D8",
+                  borderRadius: 12,
+                  padding: "12px 16px",
+                  marginBottom: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    color: "#0A2540",
+                  }}
+                >
+                  Estimated Price
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "1.4rem",
+                    fontWeight: 800,
+                    color: "#2979D8",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  {form.price}
+                </span>
+              </div>
+            )}
+
+            <FormGroup label="Vehicle Model (Optional)">
               <FocusInput
                 type="text"
                 name="vehicleModel"
@@ -533,11 +556,9 @@ const BookingModal: React.FC<BookingModalProps> = ({
                     ? "e.g. Honda Activa, Royal Enfield 350…"
                     : "e.g. Maruti Swift, Hyundai Creta…"
                 }
-                required
               />
             </FormGroup>
 
-            {/* Vehicle Number + Date */}
             <div className="modal-grid">
               <FormGroup label="Vehicle Number (Optional)">
                 <FocusInput
@@ -558,7 +579,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </FormGroup>
             </div>
 
-            {/* Notes */}
             <FormGroup label="Additional Notes">
               <FocusTextarea
                 name="message"
@@ -569,7 +589,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
               />
             </FormGroup>
 
-            {/* Toast — shown above action buttons */}
+            {/* Toast */}
             {toast.status !== "idle" && (
               <div
                 style={{
@@ -584,10 +604,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   marginBottom: 16,
                   textAlign: "center",
                   lineHeight: 1.5,
-                  boxShadow:
-                    toast.status === "success"
-                      ? "0 4px 16px rgba(39,174,96,0.2)"
-                      : "0 4px 16px rgba(231,76,60,0.2)",
                 }}
               >
                 {toast.message}
@@ -617,7 +633,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </div>
             )}
 
-            {/* Actions */}
             <div
               className="modal-actions"
               style={{ display: "flex", gap: 12, marginTop: 8 }}
@@ -636,7 +651,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   fontSize: "0.9rem",
                   cursor: "pointer",
                   fontFamily: "'DM Sans', sans-serif",
-                  transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background =
@@ -681,11 +695,6 @@ const SubmitButton: React.FC<{ submitting: boolean }> = ({ submitting }) => {
         fontSize: "0.95rem",
         fontWeight: 700,
         cursor: submitting ? "not-allowed" : "pointer",
-        boxShadow:
-          hovered && !submitting
-            ? "0 8px 24px rgba(37,211,102,0.35)"
-            : "0 4px 16px rgba(41,121,216,0.3)",
-        transform: hovered && !submitting ? "translateY(-1px)" : "none",
         transition: "all 0.3s ease",
         display: "flex",
         alignItems: "center",

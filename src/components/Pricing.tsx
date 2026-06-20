@@ -87,25 +87,6 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
         </div>
       </div>
 
-      {/* Water / electricity note */}
-      <div style={{ textAlign: "center", marginBottom: 48 }}>
-        <span
-          className="pricing-note"
-          style={{
-            fontSize: "0.82rem",
-            color: "#4A6FA5",
-            background: "#F3F8FF",
-            border: "1px solid #dbeafe",
-            borderRadius: 8,
-            padding: "6px 16px",
-            display: "inline-block",
-          }}
-        >
-          📌 For car wash plans — customer to provide water &amp; an electric
-          point
-        </span>
-      </div>
-
       {/* All plans in one row */}
       <div className="pricing-all-grid">
         {allPlans.map((plan, i) => (
@@ -289,7 +270,7 @@ const PricingCard: React.FC<{
         10% OFF
       </div>
 
-      {/* Bike badge */}
+      {/* Bike badge + notice */}
       {plan.isBike && (
         <>
           <div
@@ -340,11 +321,12 @@ const PricingCard: React.FC<{
       {/* Plan name */}
       <div
         style={{
-          fontFamily: "'Playfair Display', serif",
+          fontFamily: "'DM Sans', sans-serif",
           fontSize: "1rem",
           fontWeight: 700,
           lineHeight: 1.3,
-          paddingRight: 20,
+          paddingRight: 24,
+          color: plan.featured ? "#fff" : "#0A2540",
         }}
       >
         {plan.name}
@@ -354,87 +336,107 @@ const PricingCard: React.FC<{
       <div
         style={{
           fontSize: "0.78rem",
-          opacity: 0.7,
-          marginTop: 6,
-          marginBottom: 4,
           lineHeight: 1.4,
+          marginTop: 4,
+          marginBottom: 16,
+          color: plan.featured ? "rgba(255,255,255,0.55)" : "#64748b",
         }}
       >
         {plan.tagline}
       </div>
 
-      {/* Price + strikethrough */}
+      {/* Price row */}
       <div
         style={{
           display: "flex",
           alignItems: "baseline",
           gap: 8,
-          margin: "16px 0 2px",
-          flexWrap: "wrap",
+          marginBottom: 4,
         }}
       >
-        <div
+        <span
           style={{
-            fontSize: "2.4rem",
-            fontWeight: 900,
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: "2.2rem",
+            fontWeight: 800,
             letterSpacing: "-1px",
             color: plan.featured ? "#fff" : "#0A2540",
             lineHeight: 1,
           }}
         >
           ₹{plan.price}
-        </div>
-        <div
+        </span>
+        <span
           style={{
-            fontSize: "1rem",
-            fontWeight: 600,
-            color: plan.featured ? "rgba(255,255,255,0.45)" : "#94a3b8",
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: "0.95rem",
+            fontWeight: 500,
+            color: plan.featured ? "rgba(255,255,255,0.35)" : "#94a3b8",
             textDecoration: "line-through",
           }}
         >
           ₹{plan.originalPrice}
-        </div>
-      </div>
-      <div
-        style={{
-          fontSize: "0.72rem",
-          fontWeight: 600,
-          color: plan.featured ? "#3ECFCF" : "#16a34a",
-          marginBottom: plan.vehicleNote ? 4 : 14,
-        }}
-      >
-        You save ₹{plan.originalPrice - plan.price}
+        </span>
       </div>
 
-      {/* Vehicle note */}
-      {plan.vehicleNote && (
-        <div
+      {/* Meta row: save + suv */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <span
           style={{
-            fontSize: "0.7rem",
-            opacity: 0.6,
-            marginBottom: 14,
-            fontStyle: "italic",
-            lineHeight: 1.4,
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            color: plan.featured ? "#3ECFCF" : "#16a34a",
           }}
         >
-          * {plan.vehicleNote}
-        </div>
-      )}
+          Save ₹{plan.originalPrice - plan.price}
+        </span>
+        {plan.suvSurcharge && (
+          <>
+            <span
+              style={{
+                width: 3,
+                height: 3,
+                borderRadius: "50%",
+                background: plan.featured ? "rgba(255,255,255,0.3)" : "#cbd5e1",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: "0.72rem",
+                fontWeight: 600,
+                color: plan.featured ? "rgba(255,255,255,0.5)" : "#64748b",
+              }}
+            >
+              SUV/MUV: +₹{plan.suvSurcharge}
+            </span>
+          </>
+        )}
+      </div>
 
       {/* Divider */}
       <div
         style={{
           height: 1,
           background: plan.featured
-            ? "rgba(255,255,255,0.15)"
+            ? "rgba(255,255,255,0.12)"
             : "rgba(10,37,64,0.08)",
-          margin: "0 0 14px",
+          marginBottom: 14,
         }}
       />
 
       {/* Features */}
       <ul
-        style={{ listStyle: "none", padding: 0, margin: "0 0 20px", flex: 1 }}
+        style={{ listStyle: "none", padding: 0, margin: "0 0 16px", flex: 1 }}
       >
         {plan.features.map((f, i) => (
           <li
@@ -443,9 +445,10 @@ const PricingCard: React.FC<{
               padding: "4px 0",
               fontSize: "0.82rem",
               display: "flex",
-              gap: 7,
+              gap: 8,
               alignItems: "flex-start",
-              lineHeight: 1.45,
+              lineHeight: 1.5,
+              color: plan.featured ? "rgba(255,255,255,0.85)" : "#334155",
             }}
           >
             <span
@@ -457,7 +460,8 @@ const PricingCard: React.FC<{
                     : "#2979D8",
                 fontWeight: 700,
                 flexShrink: 0,
-                marginTop: 1,
+                marginTop: 2,
+                fontSize: "0.75rem",
               }}
             >
               ✓
@@ -466,6 +470,36 @@ const PricingCard: React.FC<{
           </li>
         ))}
       </ul>
+
+      {/* Water note — bottom of card, before CTA */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 6,
+          marginBottom: 14,
+          padding: "8px 10px",
+          background: plan.featured
+            ? "rgba(255,255,255,0.06)"
+            : "rgba(41,121,216,0.05)",
+          borderRadius: 8,
+          border: `1px solid ${plan.featured ? "rgba(255,255,255,0.1)" : "rgba(41,121,216,0.1)"}`,
+        }}
+      >
+        <span style={{ fontSize: "0.75rem", flexShrink: 0, marginTop: 1 }}>
+          💧
+        </span>
+        <span
+          style={{
+            fontSize: "0.71rem",
+            lineHeight: 1.5,
+            color: plan.featured ? "rgba(255,255,255,0.45)" : "#64748b",
+            fontStyle: "italic",
+          }}
+        >
+          Customer to provide water &amp; electricity for the pressure washer
+        </span>
+      </div>
 
       {/* CTA */}
       <button
@@ -505,6 +539,7 @@ const PricingCard: React.FC<{
           transition: "all 0.3s ease",
           marginTop: "auto",
           fontFamily: "'DM Sans', sans-serif",
+          letterSpacing: "0.01em",
         }}
       >
         Book This Plan
