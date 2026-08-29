@@ -88,10 +88,41 @@ const NAVBAR_CSS = `
     .nav-logo-img { height: 85px; }
     .nav-desktop-links { display: none !important; }
     .nav-hamburger { display: flex !important; }
+    body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  }
+
+  /* Sticky bottom "Book Your Wash" bar — mobile only */
+  .mobile-sticky-cta { display: none; }
+  @media (max-width: 768px) {
+    .mobile-sticky-cta {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 997;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -6px 24px rgba(10,37,64,0.16);
+      box-sizing: border-box;
+    }
+    .mobile-sticky-cta button { width: 100%; }
   }
   @media (max-width: 375px) {
     .nav-container { height: 90px; padding: 0 3% 0 12px; }
     .nav-logo-img { height: 80px; }
+  }
+
+  @keyframes navBookPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(41,121,216,0.35), 0 0 0 0 rgba(62,207,207,0.5); }
+    50% { box-shadow: 0 4px 20px rgba(41,121,216,0.45), 0 0 0 8px rgba(62,207,207,0); }
+  }
+  .nav-book-btn {
+    animation: navBookPulse 2.4s ease-in-out infinite;
+  }
+  .nav-book-btn-mobile {
+    animation: navBookPulse 2.4s ease-in-out infinite;
   }
 `;
 
@@ -213,53 +244,38 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               className="nav-book-btn"
               onClick={() => onOpenBooking()}
               style={{
-                background: "linear-gradient(135deg, #2979D8, #1A4F8A)",
-                color: "#fff",
-                padding: "9px 22px",
+                background: "linear-gradient(135deg, #3ECFCF, #2979D8)",
+                color: "#0A2540",
+                padding: "12px 28px",
                 borderRadius: 50,
-                fontWeight: 600,
-                fontSize: "0.9rem",
+                fontWeight: 800,
+                fontSize: "0.98rem",
                 border: "none",
                 cursor: "pointer",
                 boxShadow: "0 4px 16px rgba(41,121,216,0.35)",
                 fontFamily: "'DM Sans', sans-serif",
-                transition: "all 0.35s ease",
+                transition: "transform 0.35s ease",
+                letterSpacing: "0.01em",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.transform =
-                  "translateY(-2px)";
+                  "translateY(-2px) scale(1.04)";
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.transform =
-                  "translateY(0)";
+                  "translateY(0) scale(1)";
               }}
             >
-              Book Now
+              Book Your Wash
             </button>
           </li>
         </ul>
 
-        {/* Mobile right side: Book Now + Hamburger */}
+        {/* Mobile right side: Hamburger (booking CTA lives in the sticky bottom bar) */}
         <div
           className="nav-hamburger"
           style={{ display: "none", alignItems: "center", gap: 8 }}
         >
-          <button
-            onClick={() => onOpenBooking()}
-            style={{
-              background: "linear-gradient(135deg, #2979D8, #1A4F8A)",
-              color: "#fff",
-              padding: "7px 16px",
-              borderRadius: 50,
-              fontWeight: 600,
-              fontSize: "0.82rem",
-              border: "none",
-              cursor: "pointer",
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-          >
-            Book Now
-          </button>
           {/* Hamburger icon */}
           <button
             onClick={() => setMenuOpen((o) => !o)}
@@ -332,6 +348,28 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           style={{ color: "#2979D8", fontWeight: 600 }}
         >
           Pricing
+        </button>
+      </div>
+
+      {/* Sticky bottom booking CTA — mobile only, stays visible while scrolling */}
+      <div className="mobile-sticky-cta">
+        <button
+          className="nav-book-btn-mobile"
+          onClick={() => onOpenBooking()}
+          style={{
+            background: "linear-gradient(135deg, #3ECFCF, #2979D8)",
+            color: "#0A2540",
+            padding: "14px 0",
+            borderRadius: 50,
+            fontWeight: 800,
+            fontSize: "1rem",
+            border: "none",
+            cursor: "pointer",
+            fontFamily: "'DM Sans', sans-serif",
+            boxShadow: "0 4px 16px rgba(41,121,216,0.35)",
+          }}
+        >
+          📅 Book Your Wash
         </button>
       </div>
     </>

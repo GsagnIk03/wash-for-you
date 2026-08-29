@@ -497,7 +497,8 @@ const PricingCard: React.FC<{
             fontStyle: "italic",
           }}
         >
-          Customer to provide water &amp; electricity for the pressure washer
+          Customer to provide 3-4 buckets of water &amp; electric point. Also,
+          remove valuable items before handling over the vehicle.
         </span>
       </div>
 
