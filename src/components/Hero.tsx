@@ -206,18 +206,6 @@ const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
           thorough clean for your car or bike — right where you park it.
         </p>
 
-        <p
-          style={{
-            fontSize: "0.85rem",
-            color: "rgba(62,207,207,0.9)",
-            marginBottom: 36,
-            fontWeight: 500,
-          }}
-        >
-          📌 Customers provide water &amp; an electric point for our pressure
-          washer.
-        </p>
-
         <div
           className="hero-cta-row"
           style={{ display: "flex", gap: 14, flexWrap: "wrap" }}
@@ -225,7 +213,7 @@ const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
           <HeroButton
             primary
             onClick={onOpenBooking}
-            label="📅 Book a Service"
+            label="📅 Book Your Wash"
           />
           <HeroButton
             onClick={() => scrollTo("pricing")}
