@@ -16,6 +16,55 @@ interface BookingPayload {
   message?: string;
 }
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const WEEKDAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+// The booking form's <input type="datetime-local"> sends a plain
+// "YYYY-MM-DDTHH:mm" string with NO timezone info — it already represents
+// the customer's intended (IST) wall-clock time. Feeding that through
+// `new Date(...)` on the server (which runs in UTC on Vercel) and then
+// re-converting to "Asia/Kolkata" double-applies the +5:30 offset, shifting
+// the time shown in the email 5.5 hours later than what was actually picked.
+// Format the raw components directly instead — no Date/timezone conversion.
+function formatPreferredDate(preferred_date?: string): string {
+  if (!preferred_date) return "Not specified";
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(preferred_date);
+  if (!m) return preferred_date;
+  const year = Number(m[1]);
+  const monthIdx = Number(m[2]) - 1;
+  const day = Number(m[3]);
+  let hour = Number(m[4]);
+  const minute = Number(m[5]);
+  const weekday =
+    WEEKDAY_NAMES[new Date(Date.UTC(year, monthIdx, day)).getUTCDay()];
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  const minuteStr = String(minute).padStart(2, "0");
+  return `${weekday}, ${MONTH_NAMES[monthIdx]} ${day}, ${year}, ${hour}:${minuteStr} ${ampm}`;
+}
+
 async function sendEmail(to: string, subject: string, html: string) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -89,13 +138,7 @@ module.exports = async function handler(req: any, res: any) {
     return res.status(400).json({ error: "Missing required fields" });
   }
 
-  const dateFormatted = preferred_date
-    ? new Date(preferred_date).toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata",
-        dateStyle: "full",
-        timeStyle: "short",
-      })
-    : "Not specified";
+  const dateFormatted = formatPreferredDate(preferred_date);
 
   const isBike = service === "Bike Wash";
   const vehicleTypeLabel = isBike ? `${vehicle} (Bike Wash)` : vehicle;
