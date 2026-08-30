@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   X,
+  Check,
   MessageCircle,
   Phone,
   CalendarCheck,
@@ -11,28 +12,28 @@ import {
   Bike as BikeIcon,
 } from "lucide-react";
 import { PRICING_PLANS, BIKE_PLAN } from "../data";
-import type { BookingFormData, ToastState } from "../types";
+import { useCart } from "../context/CartContext";
+import type { BookingFormData, ToastState, AddOnGroup } from "../types";
 
 const ALL_PLANS = [...PRICING_PLANS, BIKE_PLAN];
 const SERVICES = [...ALL_PLANS.map((p) => p.name), "General Query"];
 const CAR_VEHICLES = ["Hatchback", "Sedan", "SUV / MUV", "Commercial Van"];
 const BIKE_TYPES = ["Bike", "Scooty"];
-const SUV_VEHICLE = "SUV / MUV";
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
 const isBikeService = (service: string) => service === BIKE_PLAN.name;
 
-// Compute final price based on service + vehicle type
-const computePrice = (service: string, vehicle: string): string => {
-  if (!service || service === "General Query") return "";
-  const plan = ALL_PLANS.find((p) => p.name === service);
-  if (!plan) return "";
-  let price = plan.price;
-  if (vehicle === SUV_VEHICLE && plan.suvSurcharge) {
-    price += plan.suvSurcharge;
-  }
-  return `₹${price}`;
+// Default add-on selections for a plan: single-required groups start on their
+// first (usually free) choice, everything else starts unselected.
+const buildAddOnDefaults = (
+  groups: AddOnGroup[] = [],
+): Record<string, string[]> => {
+  const init: Record<string, string[]> = {};
+  groups.forEach((g) => {
+    init[g.id] = g.selectionType === "single-required" ? [g.choices[0].id] : [];
+  });
+  return init;
 };
 
 const inputStyle: React.CSSProperties = {
@@ -77,6 +78,28 @@ const MODAL_CSS = `
     justify-content: center; gap: 8px;
   }
   .bike-type-btn.active { background: #2979D8; border-color: #2979D8; color: #fff; box-shadow: 0 4px 12px rgba(41,121,216,0.3); }
+  .bkaddon-group { padding: 14px 0; border-bottom: 1px solid #EEF3FA; }
+  .bkaddon-group:last-of-type { border-bottom: none; }
+  .bkaddon-group-tag {
+    font-size: 0.64rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 5px; white-space: nowrap; flex-shrink: 0;
+  }
+  .bkaddon-group-tag.required { background: #FEEDEE; color: #E5484D; }
+  .bkaddon-group-tag.optional { background: #EAF3FF; color: #2979D8; }
+  .bkaddon-row { display: flex; align-items: center; gap: 12px; padding: 8px 2px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .bkaddon-row-indicator {
+    width: 20px; height: 20px; flex-shrink: 0; border: 2px solid #CBD9EB;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; box-sizing: border-box;
+  }
+  .bkaddon-row-indicator.radio { border-radius: 50%; }
+  .bkaddon-row-indicator.checkbox { border-radius: 6px; }
+  .bkaddon-row-indicator.checked { border-color: #2979D8; background: #2979D8; }
+  .bkaddon-row-indicator .bkradio-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+  .bkaddon-row-label { flex: 1; font-size: 0.86rem; color: #17293D; font-weight: 500; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+  .bkaddon-row-label-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .bkaddon-row-note { font-size: 0.7rem; font-weight: 400; color: #8598B3; }
+  .bkaddon-row-rec { font-size: 0.6rem; font-weight: 800; color: #fff; background: #2979D8; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.02em; }
+  .bkaddon-row-price { font-size: 0.82rem; font-weight: 700; color: #0A2540; flex-shrink: 0; }
   @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUpModal { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -96,6 +119,9 @@ interface BookingModalProps {
   onClose: () => void;
   preselectedService?: string;
   onServiceConsumed?: () => void;
+  // When true, the form is prefilled and locked to the current cart's
+  // contents (service + price) instead of the single-plan dropdown flow.
+  cartMode?: boolean;
 }
 
 const EMPTY_FORM: BookingFormData = {
@@ -117,7 +143,9 @@ const BookingModal: React.FC<BookingModalProps> = ({
   onClose,
   preselectedService,
   onServiceConsumed,
+  cartMode,
 }) => {
+  const cart = useCart();
   useEffect(() => {
     const id = "modal-styles";
     if (document.getElementById(id)) return;
@@ -138,31 +166,107 @@ const BookingModal: React.FC<BookingModalProps> = ({
   });
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  const bikeSelected = isBikeService(form.service);
+  // Direct-booking flow state: which plan is picked from the "Service
+  // Required" dropdown, and which of its add-ons are selected. This drives
+  // form.service / form.price the same way the cart drives them in cartMode,
+  // so a customer gets an identical price and summary whichever way they
+  // book — straight from this form, or via "Add to Cart" on a pricing card.
+  const [directPlanName, setDirectPlanName] = useState("");
+  const [directSelections, setDirectSelections] = useState<
+    Record<string, string[]>
+  >({});
+  const directPlanObj = ALL_PLANS.find((p) => p.name === directPlanName);
+  const directHasAddOns = !!directPlanObj?.addOnGroups?.length;
 
-  // Preselect plan from pricing card click
+  const cartHasBike = cart.items.some((i) => i.planName === BIKE_PLAN.name);
+  const bikeSelected = cartMode ? cartHasBike : isBikeService(directPlanName);
+
+  // Preselect plan (e.g. from a "Book This Plan" card) — not used in cart-checkout mode.
   useEffect(() => {
-    if (preselectedService) {
-      const price = computePrice(preselectedService, "");
-      setForm((f) => ({
-        ...f,
-        service: preselectedService,
-        vehicle: "",
-        price,
-      }));
+    if (preselectedService && !cartMode) {
+      setDirectPlanName(preselectedService);
+      setForm((f) => ({ ...f, vehicle: "" }));
       onServiceConsumed?.();
     }
-  }, [preselectedService]);
+  }, [preselectedService, cartMode]);
 
-  // Reset vehicle when switching between bike/car
+  // Populate the form from the cart once, when the modal opens in cart mode.
   useEffect(() => {
-    setForm((f) => ({ ...f, vehicle: "", price: computePrice(f.service, "") }));
-  }, [bikeSelected]);
+    if (cartMode && isOpen) {
+      const serviceText = cart.items
+        .map((item) => {
+          const addOnText = item.addOns
+            .flatMap((a) => a.choiceLabels)
+            .join(", ");
+          return addOnText ? `${item.planName} (${addOnText})` : item.planName;
+        })
+        .join("; ");
+      setForm((f) => ({
+        ...f,
+        service: serviceText,
+        vehicle: "",
+        price: `₹${cart.total}`,
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartMode, isOpen]);
 
-  // Recompute price when vehicle changes
+  // Reset the operational "Vehicle Type" field whenever the customer
+  // switches between a bike plan and a car plan — the two use different
+  // option sets (Bike/Scooty vs Hatchback/Sedan/…).
   useEffect(() => {
-    setForm((f) => ({ ...f, price: computePrice(f.service, f.vehicle) }));
-  }, [form.vehicle, form.service]);
+    if (cartMode) return;
+    setForm((f) => ({ ...f, vehicle: "" }));
+  }, [bikeSelected, cartMode]);
+
+  // Reset add-on selections to that plan's defaults whenever the directly-
+  // selected plan changes.
+  useEffect(() => {
+    if (cartMode) return;
+    setDirectSelections(buildAddOnDefaults(directPlanObj?.addOnGroups));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartMode, directPlanName]);
+
+  // Populate form.service / form.price from the directly-selected plan and
+  // its add-on choices — the same computation the pricing section's cart
+  // uses, so the price matches regardless of entry point.
+  useEffect(() => {
+    if (cartMode) return;
+    if (!directPlanName) {
+      setForm((f) => ({ ...f, service: "", price: "" }));
+      return;
+    }
+    if (!directPlanObj) {
+      // "General Query" — no pricing applies.
+      setForm((f) => ({ ...f, service: directPlanName, price: "" }));
+      return;
+    }
+    const groups = directPlanObj.addOnGroups ?? [];
+    const addOnLabels = groups.flatMap((g) =>
+      g.choices
+        .filter((c) => (directSelections[g.id] ?? []).includes(c.id))
+        .map((c) => c.label),
+    );
+    const addOnsTotal = groups.reduce((sum, g) => {
+      const chosen = directSelections[g.id] ?? [];
+      return (
+        sum +
+        g.choices
+          .filter((c) => chosen.includes(c.id))
+          .reduce((s, c) => s + c.price, 0)
+      );
+    }, 0);
+    const serviceText =
+      addOnLabels.length > 0
+        ? `${directPlanName} — ${addOnLabels.join(", ")}`
+        : directPlanName;
+    setForm((f) => ({
+      ...f,
+      service: serviceText,
+      price: `₹${directPlanObj.price + addOnsTotal}`,
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartMode, directPlanName, directSelections]);
 
   // Lock body scroll
   useEffect(() => {
@@ -201,10 +305,30 @@ const BookingModal: React.FC<BookingModalProps> = ({
     }
   };
 
-  // Get the plan's surcharge info for display
-  const selectedPlan = ALL_PLANS.find((p) => p.name === form.service);
-  const isSUV = form.vehicle === SUV_VEHICLE;
-  const surcharge = selectedPlan?.suvSurcharge;
+  // Toggle one add-on choice within the directly-selected plan's groups —
+  // same single-required / single-optional / multi-optional rules used by
+  // the pricing section's customization sheet.
+  const toggleDirectChoice = (group: AddOnGroup, choiceId: string) => {
+    setDirectSelections((prev) => {
+      const current = prev[group.id] ?? [];
+      if (group.selectionType === "single-required") {
+        return { ...prev, [group.id]: [choiceId] };
+      }
+      if (group.selectionType === "single-optional") {
+        return {
+          ...prev,
+          [group.id]: current[0] === choiceId ? [] : [choiceId],
+        };
+      }
+      const has = current.includes(choiceId);
+      return {
+        ...prev,
+        [group.id]: has
+          ? current.filter((id) => id !== choiceId)
+          : [...current, choiceId],
+      };
+    });
+  };
 
   const buildWhatsAppURL = (f: BookingFormData) => {
     const vehicleLabel = isBikeService(f.service)
@@ -269,6 +393,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
       const submittedForm = { ...form };
       showToast("Booking confirmed! Opening WhatsApp now…");
       setForm(EMPTY_FORM);
+      if (cartMode) cart.clear();
       setTimeout(() => {
         window.open(
           buildWhatsAppURL(submittedForm),
@@ -279,10 +404,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
       setTimeout(() => onClose(), 4000);
     } catch (err: any) {
       console.error("Booking submission error:", err);
-      showToast(
-        err.message || "Something went wrong. Please try again.",
-        true,
-      );
+      showToast(err.message || "Something went wrong. Please try again.", true);
     } finally {
       setSubmitting(false);
     }
@@ -437,21 +559,188 @@ const BookingModal: React.FC<BookingModalProps> = ({
               />
             </FormGroup>
 
-            <FormGroup label="Service Required *">
-              <FocusSelect
-                name="service"
-                value={form.service}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>
-                  Select service…
-                </option>
-                {SERVICES.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </FocusSelect>
-            </FormGroup>
+            {cartMode ? (
+              <FormGroup label="Your Order">
+                <div
+                  style={{
+                    background: "#F3F8FF",
+                    border: "1.5px solid rgba(41,121,216,0.2)",
+                    borderRadius: 10,
+                    padding: "12px 14px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 6,
+                  }}
+                >
+                  {cart.items.map((item) => (
+                    <div
+                      key={item.id}
+                      style={{ fontSize: "0.85rem", color: "#0A2540" }}
+                    >
+                      <strong>{item.planName}</strong>
+                      {item.addOns.length > 0 && (
+                        <span style={{ color: "#4A6FA5" }}>
+                          {" — "}
+                          {item.addOns
+                            .flatMap((a) => a.choiceLabels)
+                            .join(", ")}
+                        </span>
+                      )}
+                      <span style={{ color: "#2979D8", fontWeight: 700 }}>
+                        {" "}
+                        ₹{item.totalPrice}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </FormGroup>
+            ) : (
+              <>
+                <FormGroup label="Service Required *">
+                  <FocusSelect
+                    name="directPlan"
+                    value={directPlanName}
+                    onChange={(e) => setDirectPlanName(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select service…
+                    </option>
+                    {SERVICES.map((s) => (
+                      <option key={s}>{s}</option>
+                    ))}
+                  </FocusSelect>
+                </FormGroup>
+
+                {/* Add-on configurator — same groups, same prices, as the
+                    pricing section's "Customise & Add to Cart" sheet. */}
+                {directHasAddOns && directPlanObj && (
+                  <div style={{ marginBottom: 16 }}>
+                    {(directPlanObj.addOnGroups ?? []).map((g) => {
+                      const chosen = directSelections[g.id] ?? [];
+                      const isMulti = g.selectionType === "multi-optional";
+                      const showNoneRow = g.selectionType === "single-optional";
+                      return (
+                        <div className="bkaddon-group" key={g.id}>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              gap: 8,
+                              marginBottom: 8,
+                            }}
+                          >
+                            <div>
+                              <div
+                                style={{
+                                  fontSize: "0.85rem",
+                                  fontWeight: 700,
+                                  color: "#0A2540",
+                                }}
+                              >
+                                {g.title}
+                              </div>
+                              {g.helperText && (
+                                <div
+                                  style={{
+                                    fontSize: "0.72rem",
+                                    color: "#8598B3",
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  {g.helperText}
+                                </div>
+                              )}
+                            </div>
+                            <span
+                              className={`bkaddon-group-tag ${g.selectionType === "single-required" ? "required" : "optional"}`}
+                            >
+                              {g.selectionType === "single-required"
+                                ? "Required"
+                                : g.selectionType === "multi-optional"
+                                  ? "Select any"
+                                  : "Select up to 1"}
+                            </span>
+                          </div>
+
+                          {showNoneRow && (
+                            <label
+                              className="bkaddon-row"
+                              onClick={() =>
+                                setDirectSelections((prev) => ({
+                                  ...prev,
+                                  [g.id]: [],
+                                }))
+                              }
+                            >
+                              <span
+                                className={`bkaddon-row-indicator radio${chosen.length === 0 ? " checked" : ""}`}
+                              >
+                                {chosen.length === 0 && (
+                                  <span className="bkradio-dot" />
+                                )}
+                              </span>
+                              <span
+                                className="bkaddon-row-label"
+                                style={{ color: "#8598B3" }}
+                              >
+                                None, thanks
+                              </span>
+                            </label>
+                          )}
+
+                          {g.choices.map((c) => {
+                            const isChecked = chosen.includes(c.id);
+                            const shape = isMulti ? "checkbox" : "radio";
+                            return (
+                              <label
+                                key={c.id}
+                                className="bkaddon-row"
+                                onClick={() => toggleDirectChoice(g, c.id)}
+                              >
+                                <span
+                                  className={`bkaddon-row-indicator ${shape}${isChecked ? " checked" : ""}`}
+                                >
+                                  {isChecked &&
+                                    (shape === "checkbox" ? (
+                                      <Check
+                                        size={12}
+                                        strokeWidth={3.2}
+                                        color="#fff"
+                                      />
+                                    ) : (
+                                      <span className="bkradio-dot" />
+                                    ))}
+                                </span>
+                                <span className="bkaddon-row-label">
+                                  <span className="bkaddon-row-label-line">
+                                    {c.label}
+                                    {c.recommended && (
+                                      <span className="bkaddon-row-rec">
+                                        Recommended
+                                      </span>
+                                    )}
+                                  </span>
+                                  {c.note && (
+                                    <span className="bkaddon-row-note">
+                                      {c.note}
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="bkaddon-row-price">
+                                  {c.price > 0 ? `+₹${c.price}` : "Free"}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
 
             {/* Bike wash area notice */}
             {bikeSelected && (
@@ -469,7 +758,11 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   lineHeight: 1.55,
                 }}
               >
-                <MapPin size={17} strokeWidth={2.2} style={{ flexShrink: 0, marginTop: 1 }} />
+                <MapPin
+                  size={17}
+                  strokeWidth={2.2}
+                  style={{ flexShrink: 0, marginTop: 1 }}
+                />
                 <span>
                   Standalone bike wash is available{" "}
                   <strong>within 2 km of Jadavpur, Kolkata only</strong>.
@@ -515,29 +808,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
               </FormGroup>
             )}
 
-            {/* SUV surcharge notice */}
-            {isSUV && surcharge && (
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  background: "#fff7ed",
-                  border: "1.5px solid #fed7aa",
-                  borderRadius: 10,
-                  padding: "10px 14px",
-                  marginBottom: 16,
-                  fontSize: "0.82rem",
-                  color: "#92400e",
-                  lineHeight: 1.5,
-                }}
-              >
-                <span>
-                  SUV / MUV surcharge of <strong>+₹{surcharge}</strong> applies
-                  for this plan.
-                </span>
-              </div>
-            )}
-
             {/* Price display */}
             {form.price && (
               <div
@@ -560,7 +830,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
                     color: "#0A2540",
                   }}
                 >
-                  Estimated Price
+                  {cartMode ? "Order Total" : "Estimated Price"}
                 </span>
                 <span
                   style={{
