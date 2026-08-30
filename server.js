@@ -1,5 +1,5 @@
 // Simple local API server — replaces vercel dev for local testing
-// Loads .env.local, serves /api/send-booking on port 3001
+// Loads .env.local, serves every file under /api as /api/<name>
 
 const http = require("http");
 const path = require("path");
@@ -31,26 +31,35 @@ if (fs.existsSync(envPath)) {
       : "❌ NOT SET",
   );
   console.log("   BUSINESS_EMAIL:", process.env.BUSINESS_EMAIL || "❌ NOT SET");
+  console.log(
+    "   GOOGLE_PLACES_API_KEY:",
+    process.env.GOOGLE_PLACES_API_KEY ? "set" : "not set (Reviews will show fallback)",
+  );
+  console.log(
+    "   GOOGLE_PLACE_ID:",
+    process.env.GOOGLE_PLACE_ID || "not set (Reviews will show fallback)",
+  );
 } else {
   console.warn("❌ .env.local NOT FOUND at:", envPath);
 }
 
-// ── Load the API handler ──────────────────────────────────────
-// Compile TS on the fly using ts-node if available, else require JS fallback
-let handler;
-try {
-  require("ts-node").register({ transpileOnly: true, esm: false });
-  handler = require("./api/send-booking.ts");
-} catch (e) {
-  console.error("ts-node not found, trying direct require...", e.message);
-  handler = require("./api/send-booking");
+require("ts-node").register({ transpileOnly: true, esm: false });
+
+const API_DIR = path.join(__dirname, "api");
+
+function loadHandler(name) {
+  const file = path.join(API_DIR, `${name}.ts`);
+  if (!fs.existsSync(file)) return null;
+  // Bust require cache so edits are picked up without restarting.
+  delete require.cache[require.resolve(file)];
+  return require(file);
 }
 
 // ── HTTP server ───────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
   // CORS for local dev
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -59,36 +68,54 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.url === "/api/send-booking" || req.url === "/api/send-booking/") {
-    // Wrap Node's IncomingMessage to provide Express-like res API
-    const mockRes = {
-      _status: 200,
-      _body: "",
-      status(code) {
-        this._status = code;
-        return this;
-      },
-      json(obj) {
-        res.writeHead(this._status, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(obj));
-      },
-    };
-    try {
-      await handler(req, mockRes);
-    } catch (err) {
-      console.error("Handler error:", err);
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Internal server error" }));
-    }
-  } else {
+  const match = (req.url || "").match(/^\/api\/([a-zA-Z0-9-_]+)\/?(\?.*)?$/);
+  if (!match) {
     res.writeHead(404);
     res.end("Not found");
+    return;
+  }
+
+  const name = match[1];
+  let handler;
+  try {
+    handler = loadHandler(name);
+  } catch (e) {
+    console.error(`Failed to load api/${name}.ts:`, e.message);
+  }
+
+  if (!handler) {
+    res.writeHead(404);
+    res.end(`No handler for /api/${name}`);
+    return;
+  }
+
+  // Wrap Node's IncomingMessage to provide Express-like res API
+  const mockRes = {
+    _status: 200,
+    status(code) {
+      this._status = code;
+      return this;
+    },
+    setHeader(k, v) {
+      res.setHeader(k, v);
+      return this;
+    },
+    json(obj) {
+      res.writeHead(this._status, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(obj));
+    },
+  };
+
+  try {
+    await handler(req, mockRes);
+  } catch (err) {
+    console.error(`Handler error in api/${name}.ts:`, err);
+    res.writeHead(500, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Internal server error" }));
   }
 });
 
 const PORT = 3001;
 server.listen(PORT, () => {
-  console.log(
-    `🔌 API server running on http://localhost:${PORT}/api/send-booking`,
-  );
+  console.log(`🔌 API server running on http://localhost:${PORT}/api/*`);
 });

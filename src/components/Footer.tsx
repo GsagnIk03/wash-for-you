@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const INSTAGRAM_URL = "https://www.instagram.com/wash_for_u";
 const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=61590411313790";
@@ -22,18 +23,30 @@ const Footer: React.FC = () => {
       document.getElementById(id)?.remove();
     };
   }, []);
-  const scrollTo = (id: string) => {
-    history.replaceState(null, "", `#${id}`);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const links = [
-    { label: "Our Story", id: "history" },
+  const links: { label: string; id: string; route?: string }[] = [
+    { label: "Our Story", id: "history", route: "/history" },
     { label: "Services", id: "services" },
     { label: "Pricing", id: "pricing" },
-    { label: "Gallery", id: "gallery" },
+    { label: "Reviews", id: "reviews" },
+    { label: "Gallery", id: "gallery", route: "/gallery" },
     { label: "Contact", id: "contact" },
   ];
+
+  const goTo = (link: (typeof links)[number]) => {
+    if (link.route) {
+      navigate(link.route);
+      return;
+    }
+    if (location.pathname !== "/") {
+      navigate(`/#${link.id}`);
+      return;
+    }
+    history.replaceState(null, "", `#${link.id}`);
+    document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <footer
@@ -57,7 +70,7 @@ const Footer: React.FC = () => {
       >
         <div
           style={{
-            fontFamily: "'Playfair Display', serif",
+            fontFamily: "'Sora', sans-serif",
             fontSize: "1.1rem",
             fontWeight: 700,
             color: "#fff",
@@ -80,7 +93,7 @@ const Footer: React.FC = () => {
         >
           {links.map((l) => (
             <li key={l.id}>
-              <FooterLink label={l.label} onClick={() => scrollTo(l.id)} />
+              <FooterLink label={l.label} onClick={() => goTo(l)} />
             </li>
           ))}
         </ul>
@@ -168,7 +181,7 @@ const FooterLink: React.FC<{ label: string; onClick: () => void }> = ({
         background: "none",
         border: "none",
         cursor: "pointer",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontSize: "0.85rem",
         color: hovered ? "#3ECFCF" : "rgba(255,255,255,0.5)",
         transition: "color 0.3s ease",

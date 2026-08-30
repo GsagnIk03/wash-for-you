@@ -1,4 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
+import {
+  X,
+  MessageCircle,
+  Phone,
+  CalendarCheck,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  MapPin,
+  Bike as BikeIcon,
+} from "lucide-react";
 import { PRICING_PLANS, BIKE_PLAN } from "../data";
 import type { BookingFormData, ToastState } from "../types";
 
@@ -29,7 +40,7 @@ const inputStyle: React.CSSProperties = {
   padding: "11px 14px",
   border: "1.5px solid rgba(41,121,216,0.2)",
   borderRadius: 10,
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "'Inter', sans-serif",
   fontSize: "0.9rem",
   color: "#0A2540",
   background: "#F3F8FF",
@@ -61,13 +72,15 @@ const MODAL_CSS = `
   .bike-type-btn {
     flex: 1; padding: 10px 0; border-radius: 10px;
     border: 1.5px solid rgba(41,121,216,0.2); background: #F3F8FF; color: #4A6FA5;
-    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center;
     justify-content: center; gap: 8px;
   }
   .bike-type-btn.active { background: #2979D8; border-color: #2979D8; color: #fff; box-shadow: 0 4px 12px rgba(41,121,216,0.3); }
   @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUpModal { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin-icon { animation: spin 0.9s linear infinite; }
   @media (max-width: 600px) {
     .modal-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
     .modal-header { padding: 20px 20px 16px; }
@@ -89,6 +102,7 @@ const EMPTY_FORM: BookingFormData = {
   from_name: "",
   from_email: "",
   phone: "",
+  address: "",
   service: "",
   vehicle: "",
   vehicleModel: "",
@@ -197,19 +211,20 @@ const BookingModal: React.FC<BookingModalProps> = ({
       ? `${f.vehicle} (Bike Wash)`
       : f.vehicle;
     const lines = [
-      `🚗 New Booking — Wash For U`,
+      `New Booking — Wash For U`,
       ``,
-      `👤 Name: ${f.from_name}`,
-      `📞 Phone: ${f.phone}`,
-      `📧 Email: ${f.from_email}`,
+      `Name: ${f.from_name}`,
+      `Phone: ${f.phone}`,
+      `Email: ${f.from_email}`,
+      `Address: ${f.address || "Not specified"}`,
       ``,
-      `🧽 Service: ${f.service}`,
-      `🚙 Vehicle: ${vehicleLabel}`,
-      `📋 Model: ${f.vehicleModel || "Not specified"}`,
-      `🔢 Number: ${f.vehicleNumber || "Not specified"}`,
-      `💰 Price: ${f.price || "To be confirmed"}`,
-      `📅 Date & Time: ${f.preferred_date || "Not specified"}`,
-      `📝 Notes: ${f.message || "None"}`,
+      `Service: ${f.service}`,
+      `Vehicle: ${vehicleLabel}`,
+      `Model: ${f.vehicleModel || "Not specified"}`,
+      `Number: ${f.vehicleNumber || "Not specified"}`,
+      `Price: ${f.price || "To be confirmed"}`,
+      `Date & Time: ${f.preferred_date || "Not specified"}`,
+      `Notes: ${f.message || "None"}`,
     ];
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
   };
@@ -219,6 +234,10 @@ const BookingModal: React.FC<BookingModalProps> = ({
     const phoneRegex = /^(?:\+?91[\s-]?)?[6-9]\d{9}$/;
     if (!phoneRegex.test(form.phone.trim())) {
       showToast("Please enter a valid 10-digit phone number.", true);
+      return;
+    }
+    if (!form.address.trim()) {
+      showToast("Please enter the address for the doorstep visit.", true);
       return;
     }
     if (!form.vehicle) {
@@ -248,7 +267,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
       if (!res.ok)
         throw new Error(data.error || `Server error (${res.status})`);
       const submittedForm = { ...form };
-      showToast("✅ Booking confirmed! Opening WhatsApp now…");
+      showToast("Booking confirmed! Opening WhatsApp now…");
       setForm(EMPTY_FORM);
       setTimeout(() => {
         window.open(
@@ -261,7 +280,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
     } catch (err: any) {
       console.error("Booking submission error:", err);
       showToast(
-        `❌ ${err.message || "Something went wrong. Please try again."}`,
+        err.message || "Something went wrong. Please try again.",
         true,
       );
     } finally {
@@ -291,9 +310,9 @@ const BookingModal: React.FC<BookingModalProps> = ({
             <div>
               <h2
                 style={{
-                  fontFamily: "'Playfair Display', serif",
+                  fontFamily: "'Sora', sans-serif",
                   fontSize: "1.4rem",
-                  fontWeight: 800,
+                  fontWeight: 700,
                   color: "#0A2540",
                   margin: "0 0 4px",
                 }}
@@ -306,6 +325,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
             </div>
             <button
               onClick={onClose}
+              aria-label="Close modal"
               style={{
                 background: "#F3F8FF",
                 border: "none",
@@ -316,13 +336,11 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                fontSize: "1.1rem",
                 color: "#4A6FA5",
                 flexShrink: 0,
               }}
-              aria-label="Close modal"
             >
-              ✕
+              <X size={17} strokeWidth={2.3} />
             </button>
           </div>
           <div
@@ -346,7 +364,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 textDecoration: "none",
               }}
             >
-              <span>💬</span> WhatsApp
+              <MessageCircle size={13} strokeWidth={2.3} />
+              WhatsApp
             </a>
             <a
               href="tel:+919477588518"
@@ -364,7 +383,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 textDecoration: "none",
               }}
             >
-              <span>📞</span> Call Now
+              <Phone size={13} strokeWidth={2.3} />
+              Call Now
             </a>
           </div>
         </div>
@@ -406,6 +426,17 @@ const BookingModal: React.FC<BookingModalProps> = ({
               />
             </FormGroup>
 
+            <FormGroup label="Address *">
+              <FocusTextarea
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                rows={2}
+                placeholder="Flat / house no., street, landmark, area"
+                required
+              />
+            </FormGroup>
+
             <FormGroup label="Service Required *">
               <FocusSelect
                 name="service"
@@ -438,7 +469,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   lineHeight: 1.55,
                 }}
               >
-                <span style={{ fontSize: "1.1rem", flexShrink: 0 }}>📍</span>
+                <MapPin size={17} strokeWidth={2.2} style={{ flexShrink: 0, marginTop: 1 }} />
                 <span>
                   Standalone bike wash is available{" "}
                   <strong>within 2 km of Jadavpur, Kolkata only</strong>.
@@ -460,7 +491,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
                       className={`bike-type-btn${form.vehicle === type ? " active" : ""}`}
                       onClick={() => setForm((f) => ({ ...f, vehicle: type }))}
                     >
-                      {type === "Bike" ? "🏍️" : "🛵"} {type}
+                      <BikeIcon size={15} strokeWidth={2.2} />
+                      {type}
                     </button>
                   ))}
                 </div>
@@ -499,7 +531,6 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   lineHeight: 1.5,
                 }}
               >
-                <span style={{ flexShrink: 0 }}>🚙</span>
                 <span>
                   SUV / MUV surcharge of <strong>+₹{surcharge}</strong> applies
                   for this plan.
@@ -523,7 +554,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
               >
                 <span
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: "0.85rem",
                     fontWeight: 600,
                     color: "#0A2540",
@@ -533,9 +564,9 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 </span>
                 <span
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Sora', sans-serif",
                     fontSize: "1.4rem",
-                    fontWeight: 800,
+                    fontWeight: 700,
                     color: "#2979D8",
                     letterSpacing: "-0.5px",
                   }}
@@ -606,7 +637,21 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   lineHeight: 1.5,
                 }}
               >
-                {toast.message}
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    justifyContent: "center",
+                  }}
+                >
+                  {toast.status === "success" ? (
+                    <CheckCircle2 size={17} strokeWidth={2.2} />
+                  ) : (
+                    <AlertCircle size={17} strokeWidth={2.2} />
+                  )}
+                  {toast.message}
+                </span>
                 {toast.status === "error" && (
                   <div style={{ marginTop: 10 }}>
                     <a
@@ -626,7 +671,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
                         textDecoration: "none",
                       }}
                     >
-                      💬 Book directly via WhatsApp
+                      <MessageCircle size={14} strokeWidth={2.3} />
+                      Book directly via WhatsApp
                     </a>
                   </div>
                 )}
@@ -650,7 +696,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
                   fontWeight: 600,
                   fontSize: "0.9rem",
                   cursor: "pointer",
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background =
@@ -691,7 +737,7 @@ const SubmitButton: React.FC<{ submitting: boolean }> = ({ submitting }) => {
         color: "#fff",
         border: "none",
         borderRadius: 12,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontSize: "0.95rem",
         fontWeight: 700,
         cursor: submitting ? "not-allowed" : "pointer",
@@ -702,7 +748,17 @@ const SubmitButton: React.FC<{ submitting: boolean }> = ({ submitting }) => {
         gap: 8,
       }}
     >
-      {submitting ? "⏳ Sending…" : "📅 Submit Booking"}
+      {submitting ? (
+        <>
+          <Loader2 size={16} strokeWidth={2.4} className="spin-icon" />
+          Sending…
+        </>
+      ) : (
+        <>
+          <CalendarCheck size={16} strokeWidth={2.4} />
+          Submit Booking
+        </>
+      )}
     </button>
   );
 };

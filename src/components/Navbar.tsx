@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Menu, X, CalendarCheck } from "lucide-react";
 import { useScrolled } from "../hooks";
 import logoImg from "../logo_final.jpeg";
 
@@ -70,7 +72,7 @@ const NAVBAR_CSS = `
     background: none;
     border: none;
     cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1rem;
     font-weight: 500;
     color: #0A2540;
@@ -113,18 +115,21 @@ const NAVBAR_CSS = `
     .nav-container { height: 90px; padding: 0 3% 0 12px; }
     .nav-logo-img { height: 80px; }
   }
-
-  @keyframes navBookPulse {
-    0%, 100% { box-shadow: 0 4px 16px rgba(41,121,216,0.35), 0 0 0 0 rgba(62,207,207,0.5); }
-    50% { box-shadow: 0 4px 20px rgba(41,121,216,0.45), 0 0 0 8px rgba(62,207,207,0); }
-  }
-  .nav-book-btn {
-    animation: navBookPulse 2.4s ease-in-out infinite;
-  }
-  .nav-book-btn-mobile {
-    animation: navBookPulse 2.4s ease-in-out infinite;
-  }
 `;
+
+interface NavLinkItem {
+  label: string;
+  id: string;
+  route?: string; // if set, navigates to a dedicated page instead of scrolling
+}
+
+const NAV_LINKS: NavLinkItem[] = [
+  { label: "Our Story", id: "history", route: "/history" },
+  { label: "Services", id: "services" },
+  { label: "Reviews", id: "reviews" },
+  { label: "Gallery", id: "gallery", route: "/gallery" },
+  { label: "Contact", id: "contact" },
+];
 
 interface NavbarProps {
   onOpenBooking: () => void;
@@ -133,6 +138,8 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
   const scrolled = useScrolled(40);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const id = "navbar-responsive-styles";
@@ -153,20 +160,31 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const scrollTo = (id: string) => {
+  const goTo = (link: NavLinkItem) => {
     setMenuOpen(false);
-    history.replaceState(null, "", `#${id}`);
+    if (link.route) {
+      navigate(link.route);
+      return;
+    }
+    if (location.pathname !== "/") {
+      navigate(`/#${link.id}`);
+      return;
+    }
+    history.replaceState(null, "", `#${link.id}`);
     setTimeout(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
     }, 50);
   };
 
-  const mobileLinks = [
-    { label: "Our Story", id: "history" },
-    { label: "Services", id: "services" },
-    { label: "Gallery", id: "gallery" },
-    { label: "Contact", id: "contact" },
-  ];
+  const scrollTo = (id: string) => goTo({ label: "", id });
+
+  const goHome = () => {
+    if (location.pathname !== "/") {
+      navigate("/");
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <>
@@ -190,23 +208,15 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
         }}
       >
         {/* Logo */}
-        <div
-          className="nav-logo-wrapper"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
+        <div className="nav-logo-wrapper" onClick={goHome}>
           <img src={logoImg} alt="Wash For U Logo" className="nav-logo-img" />
         </div>
 
         {/* Desktop nav */}
         <ul className="nav-desktop-links">
-          {[
-            { label: "Our Story", id: "history" },
-            { label: "Services", id: "services" },
-            { label: "Gallery", id: "gallery" },
-            { label: "Contact", id: "contact" },
-          ].map((link) => (
+          {NAV_LINKS.map((link) => (
             <li key={link.id} className="nav-link-desktop-only">
-              <NavLink label={link.label} onClick={() => scrollTo(link.id)} />
+              <NavLinkButton label={link.label} onClick={() => goTo(link)} />
             </li>
           ))}
           <li>
@@ -222,7 +232,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
                 fontSize: "0.9rem",
                 border: "2px solid #2979D8",
                 cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 transition: "all 0.3s ease",
               }}
               onMouseEnter={(e) => {
@@ -244,16 +254,19 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               className="nav-book-btn"
               onClick={() => onOpenBooking()}
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
                 background: "linear-gradient(135deg, #3ECFCF, #2979D8)",
                 color: "#0A2540",
-                padding: "12px 28px",
+                padding: "12px 26px",
                 borderRadius: 50,
-                fontWeight: 800,
-                fontSize: "0.98rem",
+                fontWeight: 700,
+                fontSize: "0.95rem",
                 border: "none",
                 cursor: "pointer",
                 boxShadow: "0 4px 16px rgba(41,121,216,0.35)",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 transition: "transform 0.35s ease",
                 letterSpacing: "0.01em",
               }}
@@ -266,6 +279,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
                   "translateY(0) scale(1)";
               }}
             >
+              <CalendarCheck size={16} strokeWidth={2.4} />
               Book Your Wash
             </button>
           </li>
@@ -276,7 +290,6 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           className="nav-hamburger"
           style={{ display: "none", alignItems: "center", gap: 8 }}
         >
-          {/* Hamburger icon */}
           <button
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Toggle menu"
@@ -286,58 +299,23 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
               cursor: "pointer",
               padding: "8px",
               display: "flex",
-              flexDirection: "column",
-              gap: 5,
               alignItems: "center",
               justifyContent: "center",
+              color: menuOpen ? "#2979D8" : "#0A2540",
             }}
           >
-            <span
-              style={{
-                display: "block",
-                width: 22,
-                height: 2,
-                background: menuOpen ? "#2979D8" : "#0A2540",
-                borderRadius: 2,
-                transition: "all 0.25s ease",
-                transform: menuOpen ? "rotate(45deg) translateY(7px)" : "none",
-              }}
-            />
-            <span
-              style={{
-                display: "block",
-                width: 22,
-                height: 2,
-                background: menuOpen ? "#2979D8" : "#0A2540",
-                borderRadius: 2,
-                transition: "all 0.25s ease",
-                opacity: menuOpen ? 0 : 1,
-              }}
-            />
-            <span
-              style={{
-                display: "block",
-                width: 22,
-                height: 2,
-                background: menuOpen ? "#2979D8" : "#0A2540",
-                borderRadius: 2,
-                transition: "all 0.25s ease",
-                transform: menuOpen
-                  ? "rotate(-45deg) translateY(-7px)"
-                  : "none",
-              }}
-            />
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </nav>
 
       {/* Mobile menu drawer */}
       <div className={`nav-mobile-menu${menuOpen ? " open" : ""}`}>
-        {mobileLinks.map((link) => (
+        {NAV_LINKS.map((link) => (
           <button
             key={link.id}
             className="nav-mobile-link"
-            onClick={() => scrollTo(link.id)}
+            onClick={() => goTo(link)}
           >
             {link.label}
           </button>
@@ -357,26 +335,31 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
           className="nav-book-btn-mobile"
           onClick={() => onOpenBooking()}
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
             background: "linear-gradient(135deg, #3ECFCF, #2979D8)",
             color: "#0A2540",
             padding: "14px 0",
             borderRadius: 50,
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: "1rem",
             border: "none",
             cursor: "pointer",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             boxShadow: "0 4px 16px rgba(41,121,216,0.35)",
           }}
         >
-          📅 Book Your Wash
+          <CalendarCheck size={17} strokeWidth={2.4} />
+          Book Your Wash
         </button>
       </div>
     </>
   );
 };
 
-const NavLink: React.FC<{ label: string; onClick: () => void }> = ({
+const NavLinkButton: React.FC<{ label: string; onClick: () => void }> = ({
   label,
   onClick,
 }) => {
@@ -389,7 +372,7 @@ const NavLink: React.FC<{ label: string; onClick: () => void }> = ({
         background: "none",
         border: "none",
         cursor: "pointer",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontSize: "0.9rem",
         fontWeight: 500,
         color: hovered ? "#2979D8" : "#4A6FA5",

@@ -1,43 +1,42 @@
 import React, { useEffect } from "react";
-import CarWashIllustration from "./CarWashIllustration";
+import { CalendarCheck, ArrowRight, Check } from "lucide-react";
+import heroBg from "../assets/hero-bg.jpg";
 
 const HERO_CSS = `
-  .hero-illustration {
+  .hero-bg-photo {
     position: absolute;
-    right: 4%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 46%;
-    max-width: 580px;
-    z-index: 2;
-    pointer-events: none;
-    animation: heroFadeUp 1.1s 0.25s ease both;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 38%;
+    filter: blur(2px) saturate(1.05) brightness(0.62);
+    transform: scale(1.05);
+  }
+  .hero-bg-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg, rgba(6,20,38,0.96) 0%, rgba(8,27,50,0.9) 32%, rgba(10,37,64,0.62) 58%, rgba(10,37,64,0.38) 100%),
+      linear-gradient(0deg, rgba(6,20,38,0.55) 0%, transparent 30%);
   }
   @media (min-width: 601px) and (max-width: 1024px) {
     .hero-section { padding: 120px 5% 80px !important; }
-    .hero-illustration {
-      width: 42% !important;
-      right: -2% !important;
-      opacity: 0.5 !important;
-    }
     .hero-content {
-      max-width: 65% !important;
-      position: relative !important;
-      z-index: 5 !important;
+      max-width: 68% !important;
     }
   }
   @media (max-width: 600px) {
-    .hero-illustration { display: none !important; }
-    .hero-section { padding: 100px 5% 64px !important; }
+    .hero-section { padding: 108px 5% 64px !important; }
     .hero-content { max-width: 100% !important; }
     .hero-cta-row { flex-direction: column !important; }
-    .hero-cta-row button {
+    .hero-cta-row button, .hero-cta-row a {
       width: 100% !important;
       justify-content: center !important;
       box-sizing: border-box !important;
     }
-    .hero-stats { gap: 24px !important; }
-    .hero-promo-banner { font-size: 0.75rem !important; padding: 7px 14px !important; }
+    .hero-trust { gap: 16px 22px !important; margin-top: 22px !important; padding-top: 18px !important; }
+    .hero-bg-photo { object-position: 72% 38%; }
   }
 `;
 
@@ -68,222 +67,142 @@ const Hero: React.FC<HeroProps> = ({ onOpenBooking }) => {
       className="hero-section"
       style={{
         minHeight: "100vh",
-        background: `
-          radial-gradient(ellipse 80% 60% at 70% 50%, rgba(41,121,216,0.18) 0%, transparent 65%),
-          radial-gradient(ellipse 60% 80% at 10% 80%, rgba(62,207,207,0.12) 0%, transparent 55%),
-          linear-gradient(160deg, #0A2540 0%, #0D3260 55%, #183F77 100%)
-        `,
         display: "flex",
         alignItems: "center",
-        padding: "120px 5% 80px",
+        padding: "132px 5% 80px",
         position: "relative",
         overflow: "hidden",
+        background: "#0A2540",
       }}
     >
-      {/* Ambient glows */}
-      <div
-        style={{
-          position: "absolute",
-          top: "10%",
-          right: "5%",
-          width: 340,
-          height: 340,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(62,207,207,0.08) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: -80,
-          left: "8%",
-          width: 280,
-          height: 280,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(41,121,216,0.1) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
+      <img src={heroBg} alt="" className="hero-bg-photo" aria-hidden="true" />
+      <div className="hero-bg-scrim" aria-hidden="true" />
 
       {/* Content */}
       <div
         className="hero-content"
         style={{
-          maxWidth: 520,
+          maxWidth: 560,
           position: "relative",
           zIndex: 2,
-          animation: "heroFadeUp 0.9s ease both",
         }}
       >
-        {/* Promo Banner — in flow, not absolute */}
-        <div
-          className="hero-promo-banner"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            background: "linear-gradient(90deg, #3ECFCF, #2979D8, #3ECFCF)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 3s linear infinite",
-            borderRadius: 50,
-            padding: "8px 18px",
-            fontSize: "0.8rem",
-            fontWeight: 700,
-            color: "#fff",
-            letterSpacing: "0.03em",
-            boxShadow: "0 4px 20px rgba(62,207,207,0.4)",
-            marginBottom: 20,
-            maxWidth: "100%",
-            boxSizing: "border-box",
-            flexWrap: "wrap",
-          }}
-        >
-          🎉 10% OFF on all bookings — Limited offer till 31st December 2026!
-        </div>
-
         {/* Badge */}
         <div
           style={{
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            background: "rgba(62,207,207,0.18)",
+            background: "rgba(62,207,207,0.16)",
             border: "1px solid rgba(62,207,207,0.4)",
             color: "#3ECFCF",
-            fontSize: "0.78rem",
+            fontSize: "0.76rem",
             fontWeight: 600,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            padding: "6px 16px",
+            padding: "7px 16px",
             borderRadius: 50,
-            marginBottom: 24,
+            marginBottom: 22,
             maxWidth: "100%",
             boxSizing: "border-box",
-            flexWrap: "wrap",
           }}
         >
-          🚗 Kolkata's Premier Doorstep Car &amp; Bike Wash — Wash For U
+          Kolkata&apos;s Doorstep Car &amp; Bike Wash
         </div>
 
         <h1
           style={{
-            fontFamily: "'Playfair Display', serif",
-            fontSize: "clamp(2.6rem, 5.5vw, 4.2rem)",
-            fontWeight: 900,
-            lineHeight: 1.1,
+            fontFamily: "'Sora', sans-serif",
+            fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.15,
             color: "#fff",
-            marginBottom: 24,
+            marginBottom: 18,
           }}
         >
-          Professional.
+          Skip the queue,
           <br />
-          <span
-            style={{
-              background: "linear-gradient(90deg, #3ECFCF, #6FE0E0)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Doorstep.
-          </span>
-          <br />
-          Spotless Clean.
+          <span style={{ color: "#3ECFCF" }}>we come to you.</span>
         </h1>
 
         <p
           style={{
-            fontSize: "1.05rem",
-            lineHeight: 1.75,
-            color: "rgba(255,255,255,0.72)",
-            marginBottom: 14,
+            fontFamily: "'Sora', sans-serif",
+            fontSize: "1.15rem",
+            fontWeight: 600,
+            lineHeight: 1.55,
+            color: "rgba(255,255,255,0.94)",
+            marginBottom: 32,
             maxWidth: 480,
           }}
         >
-          We bring high-pressure wash equipment to your home, delivering a deep,
-          thorough clean for your car or bike — right where you park it.
+          Premium car wash at your doorstep, starting at just ₹299.
         </p>
 
         <div
           className="hero-cta-row"
           style={{ display: "flex", gap: 14, flexWrap: "wrap" }}
         >
-          <HeroButton
-            primary
-            onClick={onOpenBooking}
-            label="📅 Book Your Wash"
-          />
-          <HeroButton
-            onClick={() => scrollTo("pricing")}
-            label="View Pricing →"
-          />
+          <HeroButton primary onClick={onOpenBooking}>
+            <CalendarCheck size={17} strokeWidth={2.3} />
+            Book a Service
+          </HeroButton>
+          <HeroButton onClick={() => scrollTo("pricing")}>
+            View Pricing
+            <ArrowRight size={16} strokeWidth={2.3} />
+          </HeroButton>
         </div>
 
-        {/* Stats */}
+        {/* Trust strip — replaces the old numeric stats row */}
         <div
-          className="hero-stats"
-          style={{ display: "flex", gap: 36, marginTop: 48, flexWrap: "wrap" }}
+          className="hero-trust"
+          style={{
+            display: "flex",
+            gap: "12px 28px",
+            flexWrap: "wrap",
+            marginTop: 36,
+            paddingTop: 24,
+            borderTop: "1px solid rgba(255,255,255,0.15)",
+          }}
         >
           {[
-            { num: "₹149", label: "Bike Wash Starts At" },
-            { num: "₹299", label: "Car Wash Starts At" },
-            { num: "10%", label: "Launch Discount" },
-          ].map((s) => (
-            <div key={s.label}>
-              <div
+            "No pickup or drop-off",
+            "Cars & bikes",
+            "Serving South Kolkata",
+          ].map((label) => (
+            <div
+              key={label}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Check size={15} strokeWidth={2.6} color="#3ECFCF" />
+              <span
                 style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: "1.9rem",
-                  fontWeight: 900,
-                  color: "#fff",
+                  fontSize: "0.84rem",
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.8)",
+                  whiteSpace: "nowrap",
                 }}
               >
-                {s.num}
-              </div>
-              <div
-                style={{
-                  fontSize: "0.78rem",
-                  color: "rgba(255,255,255,0.55)",
-                  marginTop: 2,
-                }}
-              >
-                {s.label}
-              </div>
+                {label}
+              </span>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* SVG Illustration */}
-      <div className="hero-illustration">
-        <div
-          style={{
-            position: "absolute",
-            bottom: "10%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "75%",
-            height: 40,
-            background:
-              "radial-gradient(ellipse, rgba(62,207,207,0.35) 0%, transparent 70%)",
-            filter: "blur(12px)",
-            borderRadius: "50%",
-            animation: "glowPulse 3s ease-in-out infinite",
-          }}
-        />
-        <CarWashIllustration />
       </div>
     </section>
   );
 };
 
 const HeroButton: React.FC<{
-  label: string;
+  children: React.ReactNode;
   onClick: () => void;
   primary?: boolean;
-}> = ({ label, onClick, primary }) => {
+}> = ({ children, onClick, primary }) => {
   const [hovered, setHovered] = React.useState(false);
 
   const baseStyle: React.CSSProperties = primary
@@ -311,19 +230,19 @@ const HeroButton: React.FC<{
       onMouseLeave={() => setHovered(false)}
       style={{
         ...baseStyle,
-        fontWeight: 700,
+        fontWeight: 600,
         fontSize: "0.95rem",
-        padding: primary ? "15px 32px" : "13px 30px",
+        padding: primary ? "15px 30px" : "13px 28px",
         borderRadius: 50,
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
         cursor: "pointer",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
       }}
     >
-      {label}
+      {children}
     </button>
   );
 };
