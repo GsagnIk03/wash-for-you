@@ -1,5 +1,12 @@
 import React from "react";
+import { Phone, Mail, MapPin, PhoneCall, type LucideIcon } from "lucide-react";
 import { CONTACT_INFO } from "../data";
+
+const CONTACT_ICONS: Record<string, LucideIcon> = {
+  phone: Phone,
+  mail: Mail,
+  "map-pin": MapPin,
+};
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER;
 
@@ -71,7 +78,9 @@ const ContactStrip: React.FC = () => (
           marginBottom: 40,
         }}
       >
-        {CONTACT_INFO.map((c, i) => (
+        {CONTACT_INFO.map((c, i) => {
+          const Icon = CONTACT_ICONS[c.icon] ?? Phone;
+          return (
           <div
             key={i}
             style={{
@@ -97,10 +106,9 @@ const ContactStrip: React.FC = () => (
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "1.1rem",
               }}
             >
-              {c.icon}
+              <Icon size={18} strokeWidth={2.1} color="#3ECFCF" />
             </div>
             <div style={{ minWidth: 0, textAlign: "left" }}>
               <div
@@ -127,7 +135,8 @@ const ContactStrip: React.FC = () => (
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Hours */}
@@ -206,7 +215,8 @@ const ContactStrip: React.FC = () => (
             boxShadow: "0 6px 20px rgba(41,121,216,0.35)",
           }}
         >
-          📞 Call Now
+          <PhoneCall size={16} strokeWidth={2.3} />
+          Call Now
         </a>
       </div>
 

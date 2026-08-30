@@ -1,13 +1,28 @@
 import React from "react";
+import {
+  Rocket,
+  MapPin,
+  Bike,
+  TrendingUp,
+  CarFront,
+  type LucideIcon,
+} from "lucide-react";
 import { useInView } from "../hooks";
 import { TIMELINE_ITEMS } from "../data";
 import type { TimelineItem } from "../types";
+
+const TIMELINE_ICONS: Record<string, LucideIcon> = {
+  rocket: Rocket,
+  "map-pin": MapPin,
+  bike: Bike,
+  "trending-up": TrendingUp,
+};
 
 const History: React.FC = () => (
   <section
     id="history"
     style={{
-      padding: "100px 5%",
+      padding: "64px 5% 100px",
       background: "#F3F8FF",
       boxSizing: "border-box",
     }}
@@ -40,24 +55,23 @@ const HistoryCard: React.FC = () => (
       }}
     >
       {/* Watermark */}
-      <div
+      <CarFront
+        size={140}
+        strokeWidth={1}
         style={{
           position: "absolute",
-          right: -10,
-          bottom: -10,
-          fontSize: "8rem",
+          right: -20,
+          bottom: -20,
           opacity: 0.08,
           pointerEvents: "none",
         }}
-      >
-        🚗
-      </div>
+      />
 
       <div
         style={{
-          fontFamily: "'Playfair Display', serif",
-          fontSize: "4.5rem",
-          fontWeight: 900,
+          fontFamily: "'Sora', sans-serif",
+          fontSize: "4rem",
+          fontWeight: 700,
           color: "#3ECFCF",
           lineHeight: 1,
           marginBottom: 12,
@@ -66,7 +80,14 @@ const HistoryCard: React.FC = () => (
         2026
       </div>
 
-      <h3 style={{ fontSize: "1.4rem", fontWeight: 700, marginBottom: 12 }}>
+      <h3
+        style={{
+          fontFamily: "'Sora', sans-serif",
+          fontSize: "1.4rem",
+          fontWeight: 700,
+          marginBottom: 12,
+        }}
+      >
         When It All Began
       </h3>
       <p
@@ -90,7 +111,7 @@ const HistoryCard: React.FC = () => (
         right: -20,
         background: "#3ECFCF",
         color: "#0A2540",
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: "0.85rem",
         padding: "12px 18px",
         borderRadius: 14,
@@ -99,10 +120,11 @@ const HistoryCard: React.FC = () => (
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 2,
+        gap: 4,
+        fontFamily: "'Inter', sans-serif",
       }}
     >
-      <span style={{ fontSize: "1.1rem" }}>📍</span>
+      <MapPin size={18} strokeWidth={2.2} />
       <span>Est. 2026</span>
       <span>Kolkata</span>
     </div>
@@ -115,7 +137,7 @@ const Timeline: React.FC = () => (
     <h2 className="section-title">
       A Story Built on
       <br />
-      Trust & Consistency
+      Trust &amp; Consistency
     </h2>
     <p className="section-sub" style={{ marginBottom: 36 }}>
       We're a growing car and bike wash service in South Kolkata, focused on
@@ -134,6 +156,7 @@ const TimelineRow: React.FC<{ item: TimelineItem; delay: number }> = ({
 }) => {
   const [ref, inView] = useInView<HTMLDivElement>();
   const [dotHovered, setDotHovered] = React.useState(false);
+  const Icon = TIMELINE_ICONS[item.icon] ?? Rocket;
 
   return (
     <div
@@ -158,14 +181,17 @@ const TimelineRow: React.FC<{ item: TimelineItem; delay: number }> = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "1.2rem",
           border: "2px solid rgba(41,121,216,0.2)",
           transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
           transform: dotHovered ? "scale(1.1)" : "scale(1)",
           cursor: "default",
         }}
       >
-        {item.icon}
+        <Icon
+          size={19}
+          strokeWidth={2.1}
+          color={dotHovered ? "#fff" : "#2979D8"}
+        />
       </div>
       <div>
         <div
@@ -180,7 +206,14 @@ const TimelineRow: React.FC<{ item: TimelineItem; delay: number }> = ({
         >
           {item.year}
         </div>
-        <div style={{ fontWeight: 700, fontSize: "1rem", marginBottom: 4 }}>
+        <div
+          style={{
+            fontFamily: "'Sora', sans-serif",
+            fontWeight: 700,
+            fontSize: "1rem",
+            marginBottom: 4,
+          }}
+        >
           {item.title}
         </div>
         <div style={{ fontSize: "0.9rem", color: "#4A6FA5", lineHeight: 1.65 }}>

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Check, Bike, Phone, MapPin, Droplet, RefreshCw } from "lucide-react";
 import { useInView } from "../hooks";
 import { PRICING_PLANS, BIKE_PLAN } from "../data";
 import type { PricingPlan } from "../types";
@@ -62,29 +63,6 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
           No hidden charges. No upselling. Just premium professional wash at
           fair prices across South Kolkata.
         </p>
-        {/* Discount badge */}
-        <div
-          className="pricing-header-badge"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            background: "linear-gradient(135deg, #fff7ed, #fef3c7)",
-            border: "1.5px solid #f59e0b",
-            borderRadius: 50,
-            padding: "8px 20px",
-            marginTop: 12,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          <span style={{ fontSize: "1rem" }}>🏷️</span>
-          <span
-            style={{ fontSize: "0.85rem", fontWeight: 700, color: "#92400e" }}
-          >
-            Launch Offer: 10% OFF on all plans — till 31 Dec 2026
-          </span>
-        </div>
       </div>
 
       {/* All plans in one row */}
@@ -149,12 +127,12 @@ const SubscriptionCallout: React.FC = () => {
             flexWrap: "wrap",
           }}
         >
-          <span style={{ fontSize: "1.4rem" }}>🔄</span>
+          <RefreshCw size={20} strokeWidth={2.2} color="#3ECFCF" />
           <h3
             style={{
-              fontFamily: "'Playfair Display', serif",
+              fontFamily: "'Sora', sans-serif",
               fontSize: "1.2rem",
-              fontWeight: 800,
+              fontWeight: 700,
               color: "#fff",
               margin: 0,
             }}
@@ -206,7 +184,8 @@ const SubscriptionCallout: React.FC = () => {
             "translateY(0)";
         }}
       >
-        📞 +91 94775 88518
+        <Phone size={16} strokeWidth={2.3} />
+        +91 94775 88518
       </a>
     </div>
   );
@@ -251,25 +230,6 @@ const PricingCard: React.FC<{
         overflow: "hidden",
       }}
     >
-      {/* 10% OFF ribbon */}
-      <div
-        style={{
-          position: "absolute",
-          top: 14,
-          right: -26,
-          background: "linear-gradient(135deg, #f59e0b, #d97706)",
-          color: "#fff",
-          fontSize: "0.65rem",
-          fontWeight: 800,
-          padding: "4px 32px",
-          transform: "rotate(35deg)",
-          letterSpacing: "0.05em",
-          boxShadow: "0 2px 8px rgba(245,158,11,0.4)",
-        }}
-      >
-        10% OFF
-      </div>
-
       {/* Bike badge + notice */}
       {plan.isBike && (
         <>
@@ -286,7 +246,7 @@ const PricingCard: React.FC<{
               width: "fit-content",
             }}
           >
-            <span style={{ fontSize: "0.9rem" }}>🏍️</span>
+            <Bike size={13} strokeWidth={2.4} color="#16a34a" />
             <span
               style={{ fontSize: "0.72rem", fontWeight: 700, color: "#16a34a" }}
             >
@@ -308,7 +268,11 @@ const PricingCard: React.FC<{
               lineHeight: 1.45,
             }}
           >
-            <span style={{ flexShrink: 0 }}>📍</span>
+            <MapPin
+              size={14}
+              strokeWidth={2.3}
+              style={{ flexShrink: 0, marginTop: 1 }}
+            />
             <span>
               Standalone bike wash available{" "}
               <strong>within 2 km of Jadavpur only</strong>. Outside this area,
@@ -321,11 +285,10 @@ const PricingCard: React.FC<{
       {/* Plan name */}
       <div
         style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Sora', sans-serif",
           fontSize: "1rem",
           fontWeight: 700,
           lineHeight: 1.3,
-          paddingRight: 24,
           color: plan.featured ? "#fff" : "#0A2540",
         }}
       >
@@ -351,12 +314,12 @@ const PricingCard: React.FC<{
           display: "flex",
           alignItems: "baseline",
           gap: 8,
-          marginBottom: 4,
+          marginBottom: plan.suvSurcharge ? 4 : 16,
         }}
       >
         <span
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: "2.2rem",
             fontWeight: 800,
             letterSpacing: "-1px",
@@ -366,62 +329,22 @@ const PricingCard: React.FC<{
         >
           ₹{plan.price}
         </span>
-        <span
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "0.95rem",
-            fontWeight: 500,
-            color: plan.featured ? "rgba(255,255,255,0.35)" : "#94a3b8",
-            textDecoration: "line-through",
-          }}
-        >
-          ₹{plan.originalPrice}
-        </span>
       </div>
 
-      {/* Meta row: save + suv */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 16,
-          flexWrap: "wrap",
-        }}
-      >
-        <span
-          style={{
-            fontSize: "0.72rem",
-            fontWeight: 600,
-            color: plan.featured ? "#3ECFCF" : "#16a34a",
-          }}
-        >
-          Save ₹{plan.originalPrice - plan.price}
-        </span>
-        {plan.suvSurcharge && (
-          <>
-            <span
-              style={{
-                width: 3,
-                height: 3,
-                borderRadius: "50%",
-                background: plan.featured ? "rgba(255,255,255,0.3)" : "#cbd5e1",
-                display: "inline-block",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                color: plan.featured ? "rgba(255,255,255,0.5)" : "#64748b",
-              }}
-            >
-              SUV/MUV: +₹{plan.suvSurcharge}
-            </span>
-          </>
-        )}
-      </div>
+      {/* SUV/MUV surcharge note */}
+      {plan.suvSurcharge && (
+        <div style={{ marginBottom: 16 }}>
+          <span
+            style={{
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              color: plan.featured ? "rgba(255,255,255,0.5)" : "#64748b",
+            }}
+          >
+            SUV/MUV: +₹{plan.suvSurcharge}
+          </span>
+        </div>
+      )}
 
       {/* Divider */}
       <div
@@ -451,21 +374,19 @@ const PricingCard: React.FC<{
               color: plan.featured ? "rgba(255,255,255,0.85)" : "#334155",
             }}
           >
-            <span
+            <Check
+              size={14}
+              strokeWidth={3}
               style={{
                 color: plan.featured
                   ? "#3ECFCF"
                   : plan.isBike
                     ? "#16a34a"
                     : "#2979D8",
-                fontWeight: 700,
                 flexShrink: 0,
                 marginTop: 2,
-                fontSize: "0.75rem",
               }}
-            >
-              ✓
-            </span>
+            />
             {f}
           </li>
         ))}
@@ -486,9 +407,15 @@ const PricingCard: React.FC<{
           border: `1px solid ${plan.featured ? "rgba(255,255,255,0.1)" : "rgba(41,121,216,0.1)"}`,
         }}
       >
-        <span style={{ fontSize: "0.75rem", flexShrink: 0, marginTop: 1 }}>
-          💧
-        </span>
+        <Droplet
+          size={14}
+          strokeWidth={2.2}
+          style={{
+            flexShrink: 0,
+            marginTop: 1,
+            color: plan.featured ? "rgba(255,255,255,0.45)" : "#64748b",
+          }}
+        />
         <span
           style={{
             fontSize: "0.71rem",
@@ -539,7 +466,7 @@ const PricingCard: React.FC<{
           cursor: "pointer",
           transition: "all 0.3s ease",
           marginTop: "auto",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           letterSpacing: "0.01em",
         }}
       >

@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Pricing from "./components/Pricing";
-import Services from "./components/Services";
-import History from "./components/History";
-import Gallery from "./components/Gallery";
-import ContactStrip from "./components/ContactStrip";
 import Footer from "./components/Footer";
 import BookingModal from "./components/BookingModal";
+import Home from "./pages/Home";
+import GalleryPage from "./pages/GalleryPage";
+import HistoryPage from "./pages/HistoryPage";
 import "./styles/globals.css";
 
 const App: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | undefined>();
+  const location = useLocation();
 
   const handleSelectPlan = (planName: string) => {
     setSelectedPlan(planName);
@@ -33,19 +32,20 @@ const App: React.FC = () => {
     history.replaceState(null, "", window.location.pathname);
   };
 
-  // Handle deep links on page load
+  // Handle deep links / cross-page hash navigation, e.g. Navbar linking to
+  // "/#pricing" from the Gallery or Our Story pages.
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === "#book") {
       setModalOpen(true);
-    } else if (hash === "#pricing") {
+    } else if (hash && location.pathname === "/") {
       setTimeout(() => {
         document
-          .getElementById("pricing")
+          .getElementById(hash.slice(1))
           ?.scrollIntoView({ behavior: "smooth" });
       }, 300);
     }
-  }, []);
+  }, [location.pathname]);
 
   // Sync modal state with hash changes (browser back/forward)
   useEffect(() => {
@@ -61,16 +61,35 @@ const App: React.FC = () => {
     return () => window.removeEventListener("hashchange", handler);
   }, []);
 
+  // Scroll to top on route change (skip when the booking modal hash is set).
+  useEffect(() => {
+    if (window.location.hash === "#book") return;
+    if (!window.location.hash) {
+      window.scrollTo({ top: 0 });
+    }
+  }, [location.pathname]);
+
   return (
     <>
       <Navbar onOpenBooking={handleOpenBooking} />
       <main>
-        <Hero onOpenBooking={handleOpenBooking} />
-        <Pricing onSelectPlan={handleSelectPlan} />
-        <Services />
-        <History />
-        <Gallery />
-        <ContactStrip />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                onOpenBooking={handleOpenBooking}
+                onSelectPlan={handleSelectPlan}
+              />
+            }
+          />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route
+            path="*"
+            element={<Home onOpenBooking={handleOpenBooking} onSelectPlan={handleSelectPlan} />}
+          />
+        </Routes>
       </main>
       <Footer />
       <BookingModal

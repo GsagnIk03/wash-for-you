@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Eye, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useInView } from "../hooks";
 
 import img01 from "../assets/gallery/01.jpeg";
@@ -145,7 +146,7 @@ const GALLERY_CSS = `
     transform: translateX(-50%);
     color: rgba(255,255,255,0.6);
     font-size: 0.85rem;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     z-index: 2001;
   }
   @media (max-width: 600px) {
@@ -195,7 +196,7 @@ const Gallery: React.FC = () => {
     <section
       id="gallery"
       className="gallery-section"
-      style={{ padding: "100px 5%", background: "#F3F8FF" }}
+      style={{ padding: "64px 5% 100px", background: "#F3F8FF" }}
     >
       <div style={{ marginBottom: 48 }}>
         <div className="section-label">Our Work</div>
@@ -217,9 +218,17 @@ const Gallery: React.FC = () => {
             <img src={img.src} alt={img.alt} loading="lazy" />
             <div className="gallery-item-overlay">
               <span
-                style={{ color: "#fff", fontSize: "0.8rem", fontWeight: 600 }}
+                style={{
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
               >
-                🔍 View
+                <Eye size={15} strokeWidth={2.2} />
+                View
               </span>
             </div>
           </div>
@@ -235,11 +244,13 @@ const Gallery: React.FC = () => {
           <button
             className="lightbox-close"
             onClick={() => setLightboxIndex(null)}
+            aria-label="Close"
           >
-            ✕
+            <X size={18} strokeWidth={2.3} />
           </button>
           <button
             className="lightbox-btn prev"
+            aria-label="Previous image"
             onClick={(e) => {
               e.stopPropagation();
               setLightboxIndex(
@@ -247,7 +258,7 @@ const Gallery: React.FC = () => {
               );
             }}
           >
-            ‹
+            <ChevronLeft size={24} strokeWidth={2.2} />
           </button>
           <img
             className="lightbox-img"
@@ -257,12 +268,13 @@ const Gallery: React.FC = () => {
           />
           <button
             className="lightbox-btn next"
+            aria-label="Next image"
             onClick={(e) => {
               e.stopPropagation();
               setLightboxIndex((lightboxIndex + 1) % IMAGES.length);
             }}
           >
-            ›
+            <ChevronRight size={24} strokeWidth={2.2} />
           </button>
           <div className="lightbox-counter">
             {lightboxIndex + 1} / {IMAGES.length}

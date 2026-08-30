@@ -25,6 +25,12 @@ if [ ! -f ".env.local" ]; then
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 BUSINESS_EMAIL=support@washforu.com
 VITE_WHATSAPP_NUMBER=919477588518
+
+# Powers the live Google Reviews section (src/components/Reviews.tsx).
+# Leave blank to show the section's built-in fallback state.
+# See README.md for how to get these two values.
+GOOGLE_PLACES_API_KEY=
+GOOGLE_PLACE_ID=
 ENVEOF
   echo -e "${YELLOW}   → Fill in your RESEND_API_KEY in .env.local then re-run this script.${RESET}"
   exit 1

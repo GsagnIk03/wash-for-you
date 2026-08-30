@@ -1,7 +1,25 @@
 import React from "react";
+import {
+  Droplets,
+  ShieldCheck,
+  Award,
+  Disc,
+  Bike,
+  Truck,
+  type LucideIcon,
+} from "lucide-react";
 import { useInView } from "../hooks";
 import { SERVICES } from "../data";
 import type { ServiceItem } from "../types";
+
+const SERVICE_ICONS: Record<string, LucideIcon> = {
+  droplets: Droplets,
+  "shield-check": ShieldCheck,
+  award: Award,
+  disc: Disc,
+  bike: Bike,
+  truck: Truck,
+};
 
 const Services: React.FC = () => (
   <section
@@ -84,6 +102,7 @@ const ServiceCard: React.FC<{
   inView: boolean;
 }> = ({ service, delay, inView }) => {
   const [hovered, setHovered] = React.useState(false);
+  const Icon = SERVICE_ICONS[service.icon] ?? Droplets;
 
   return (
     <div
@@ -136,17 +155,16 @@ const ServiceCard: React.FC<{
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "1.6rem",
           marginBottom: 20,
           transition: "all 0.35s ease",
         }}
       >
-        {service.icon}
+        <Icon size={24} strokeWidth={1.8} color="#3ECFCF" />
       </div>
 
       <h3
         style={{
-          fontFamily: "'Playfair Display', serif",
+          fontFamily: "'Sora', sans-serif",
           fontSize: "1.1rem",
           fontWeight: 700,
           marginBottom: 10,
