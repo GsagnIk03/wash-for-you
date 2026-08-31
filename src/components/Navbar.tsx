@@ -125,7 +125,7 @@ interface NavLinkItem {
 
 const NAV_LINKS: NavLinkItem[] = [
   { label: "Our Story", id: "history", route: "/history" },
-  { label: "Services", id: "services" },
+  { label: "Why Us", id: "why-us" },
   { label: "Reviews", id: "reviews" },
   { label: "Gallery", id: "gallery", route: "/gallery" },
   { label: "Contact", id: "contact" },
