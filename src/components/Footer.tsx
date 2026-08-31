@@ -32,6 +32,7 @@ const Footer: React.FC = () => {
     { label: "Pricing", id: "pricing" },
     { label: "Reviews", id: "reviews" },
     { label: "Gallery", id: "gallery", route: "/gallery" },
+    { label: "FAQ", id: "faq" },
     { label: "Contact", id: "contact" },
   ];
 

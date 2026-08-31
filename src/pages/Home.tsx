@@ -3,6 +3,7 @@ import Hero from "../components/Hero";
 import WhyChooseUs from "../components/WhyChooseUs";
 import Pricing from "../components/Pricing";
 import Reviews from "../components/Reviews";
+import FAQ from "../components/FAQ";
 import ContactStrip from "../components/ContactStrip";
 
 interface HomeProps {
@@ -15,6 +16,7 @@ const Home: React.FC<HomeProps> = ({ onOpenBooking }) => (
     <WhyChooseUs />
     <Pricing />
     <Reviews />
+    <FAQ />
     <ContactStrip />
   </>
 );
