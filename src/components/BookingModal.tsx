@@ -34,13 +34,31 @@ const SUPPORT_PHONE_DISPLAY = "+91 94775 88518";
 // Named-locality dropdown for the serviceability check — picking from an
 // exact area name sidesteps the fuzziness of pincode boundaries entirely.
 // Car bookings are serviceable across every area we already advertise in
-// "Service Areas". Bike-only bookings use a tighter footprint — just
-// Jadavpur itself — matching the ~2km radius called out in the bike-wash
-// area notice below.
-const OTHER_LOCALITY = "Other";
-const LOCALITY_OPTIONS = [...SERVICE_AREAS, OTHER_LOCALITY];
+// "Service Areas". A standalone bike wash (no car wash in the same cart)
+// uses a tighter, bike-only footprint: Jadavpur, Baghajatin, Ajaynagar and
+// Jadavpur P.S. — the latter two aren't general car-serviceable areas (they
+// don't appear in the site's "Service Areas" chips), so they only ever show
+// up on a bike item's own locality dropdown, and only while that dropdown
+// is showing the bike-only list. The moment a car wash joins the same cart,
+// a bike item's locality field switches to the exact same dropdown and
+// serviceable-area set as a car item — no separate footprint, no bike-only
+// areas offered — matching "no location restriction" when bundled with a
+// car wash. See hasCarInCart, computed both at render (for which options to
+// show) and in handleSubmit (for which areas to accept).
+// "None" replaces the old free-text "Other" option: picking it is a direct
+// admission the customer's area isn't in the list, so instead of silently
+// falling through to the generic "may not be serviceable" message, it gets
+// its own explicit, harder-to-miss rejection (see handleSubmit).
+const NONE_LOCALITY = "None";
 const CAR_SERVICEABLE_AREAS = SERVICE_AREAS;
-const BIKE_SERVICEABLE_AREAS = ["Jadavpur"];
+const BIKE_ONLY_AREAS = ["Ajaynagar", "Jadavpur P.S."];
+const BIKE_SERVICEABLE_AREAS = ["Jadavpur", "Baghajatin", ...BIKE_ONLY_AREAS];
+const CAR_LOCALITY_OPTIONS = [...SERVICE_AREAS, NONE_LOCALITY];
+// Only shown for a bike item with no car wash in the same cart.
+const BIKE_STANDALONE_LOCALITY_OPTIONS = [
+  ...BIKE_SERVICEABLE_AREAS,
+  NONE_LOCALITY,
+];
 
 // Default add-on selections for a plan: single-required groups start on their
 // first (usually free) choice, everything else starts unselected.
@@ -533,6 +551,13 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose }) => {
         return;
       }
       const vehicles = buildVehiclePayloads();
+      // Booking at least one car (i.e. non-bike) plan alongside a bike wash
+      // drops the bike's location restriction entirely — its dropdown (see
+      // VehicleCard) switches to the exact same options as a car item, so
+      // validation mirrors that here rather than accepting a wider set.
+      const hasCarInCart = cart.items.some(
+        (i) => i.planName !== BIKE_PLAN.name,
+      );
       for (let i = 0; i < vehicles.length; i++) {
         const v = vehicles[i];
         const item = cart.items[i];
@@ -545,9 +570,20 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose }) => {
           showToast(`Please select the locality for ${v.vehicleLabel}.`, true);
           return;
         }
-        const serviceableAreas = isBikeItem
-          ? BIKE_SERVICEABLE_AREAS
-          : CAR_SERVICEABLE_AREAS;
+        if (v.locality === NONE_LOCALITY) {
+          showToast(
+            `Choosing "None" suggests that your location for ${v.vehicleLabel} is not covered by us. If you think otherwise, please call us on ${SUPPORT_PHONE_DISPLAY} immediately.`,
+            true,
+          );
+          return;
+        }
+        // A bike booked alongside a car wash is covered wherever the car
+        // wash is — same area set as a car item, no bike-only areas. A
+        // standalone bike booking is held to its own, tighter footprint.
+        const serviceableAreas =
+          isBikeItem && !hasCarInCart
+            ? BIKE_SERVICEABLE_AREAS
+            : CAR_SERVICEABLE_AREAS;
         if (!serviceableAreas.includes(v.locality)) {
           showToast(
             `We may not be serviceable to your area for ${v.vehicleLabel}. Please call our support number (${SUPPORT_PHONE_DISPLAY}) directly to check if a technician is available to visit you.`,
@@ -803,6 +839,9 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose }) => {
                     item={item}
                     index={idx}
                     firstItem={cart.items[0]}
+                    hasCarInCart={cart.items.some(
+                      (i) => i.planName !== BIKE_PLAN.name,
+                    )}
                     isEditing={editingItemId === item.id}
                     editSelections={editSelections}
                     onStartEdit={() => startEditItem(item)}
@@ -1089,6 +1128,11 @@ const VehicleCard: React.FC<{
   item: CartItem;
   index: number;
   firstItem: CartItem;
+  // Whether any non-bike (car) plan is also in the cart — a bike item's
+  // locality field switches to the car dropdown/footprint whenever this is
+  // true, and back to the tighter bike-only list the moment it's the only
+  // vehicle left in the booking.
+  hasCarInCart: boolean;
   isEditing: boolean;
   editSelections: Record<string, string[]>;
   onStartEdit: () => void;
@@ -1102,6 +1146,7 @@ const VehicleCard: React.FC<{
   item,
   index,
   firstItem,
+  hasCarInCart,
   isEditing,
   editSelections,
   onStartEdit,
@@ -1114,6 +1159,33 @@ const VehicleCard: React.FC<{
 }) => {
   const plan = ALL_PLANS.find((p) => p.name === item.planName);
   const isBikeItem = item.planName === BIKE_PLAN.name;
+  // A standalone bike (no car wash anywhere in this cart) is restricted to
+  // the tighter bike-only area list; the moment a car wash joins the cart,
+  // this collapses to the exact same dropdown a car item would show.
+  const localityOptions =
+    isBikeItem && !hasCarInCart
+      ? BIKE_STANDALONE_LOCALITY_OPTIONS
+      : CAR_LOCALITY_OPTIONS;
+  // Computed fresh every render, independent of the effect below — the
+  // <select> never shows a value that isn't one of its own current
+  // <option>s, even for the one render before the effect has a chance to
+  // fire and actually clear the stored (now-stale) locality.
+  const displayedLocality =
+    item.locality && localityOptions.includes(item.locality)
+      ? item.locality
+      : "";
+
+  // If a car wash joins (or leaves) the cart mid-booking, this bike item's
+  // dropdown swaps lists — clear a locality that no longer appears in the
+  // new list rather than leaving the stored value stuck on one that isn't
+  // among its own options.
+  useEffect(() => {
+    if (item.locality && !localityOptions.includes(item.locality)) {
+      onPatch({ locality: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localityOptions]);
+
   const isFirst = index === 0;
   const hasAddOns = !!plan?.addOnGroups?.length;
 
@@ -1325,17 +1397,17 @@ const VehicleCard: React.FC<{
           </FormGroup>
           <FormGroup label="Locality *">
             <FocusSelect
-              value={item.locality ?? ""}
+              value={displayedLocality}
               onChange={(e) => onPatch({ locality: e.target.value })}
               required
             >
               <option value="" disabled>
                 Select your area…
               </option>
-              {LOCALITY_OPTIONS.map((area) => (
+              {localityOptions.map((area) => (
                 <option key={area} value={area}>
-                  {area === OTHER_LOCALITY
-                    ? "Other (outside these areas)"
+                  {area === NONE_LOCALITY
+                    ? "None of these (my area isn't listed)"
                     : area}
                 </option>
               ))}
@@ -1382,17 +1454,17 @@ const VehicleCard: React.FC<{
               </FormGroup>
               <FormGroup label="Locality *">
                 <FocusSelect
-                  value={item.locality ?? ""}
+                  value={displayedLocality}
                   onChange={(e) => onPatch({ locality: e.target.value })}
                   required
                 >
                   <option value="" disabled>
                     Select your area…
                   </option>
-                  {LOCALITY_OPTIONS.map((area) => (
+                  {localityOptions.map((area) => (
                     <option key={area} value={area}>
-                      {area === OTHER_LOCALITY
-                        ? "Other (outside these areas)"
+                      {area === NONE_LOCALITY
+                        ? "None of these (my area isn't listed)"
                         : area}
                     </option>
                   ))}
@@ -1403,7 +1475,7 @@ const VehicleCard: React.FC<{
         </>
       )}
 
-      {isBikeItem && (
+      {isBikeItem && !hasCarInCart && (
         <div
           style={{
             display: "flex",
@@ -1424,10 +1496,12 @@ const VehicleCard: React.FC<{
             style={{ flexShrink: 0, marginTop: 1 }}
           />
           <span>
-            Standalone bike wash is available{" "}
-            <strong>within 2 km of Jadavpur, Kolkata only</strong>. Outside this
-            area, bike wash is available only when combined with a car wash
-            booking. Not sure? Call us at{" "}
+            Standalone bike wash is available in{" "}
+            <strong>
+              Jadavpur, Baghajatin, Ajaynagar and Jadavpur P.S. only
+            </strong>
+            . Add a car wash to this booking and that restriction goes away
+            entirely. Not sure? Call us at{" "}
             <strong>{SUPPORT_PHONE_DISPLAY}</strong>.
           </span>
         </div>

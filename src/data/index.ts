@@ -134,7 +134,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 599,
     bgImageKey: "basic",
     fullPhotoBg: true,
-    estimatedTime: "60–90 minutes — varies with add-ons selected",
+    estimatedTime: "1-1.5hrs — varies with add-ons selected",
     features: [
       "Exterior pressure wash",
       "Foam wash",
@@ -188,7 +188,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 1299,
     bgImageKey: "advance",
     fullPhotoBg: true,
-    estimatedTime: "2–2.5 hours — varies with add-ons selected",
+    estimatedTime: "2–2.5hrs — varies with add-ons selected",
     features: [
       "Exterior pressure wash",
       "Foam wash",
@@ -238,7 +238,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 1799,
     bgImageKey: "premium",
     fullPhotoBg: true,
-    estimatedTime: "180–200 minutes — varies with add-ons selected",
+    estimatedTime: "3-3.5hrs — varies with add-ons selected",
     features: [
       "Exterior pressure wash",
       "Foam wash",
