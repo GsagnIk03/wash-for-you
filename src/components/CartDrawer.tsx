@@ -1,5 +1,11 @@
-import React, { useEffect } from "react";
-import { ShoppingCart, X, Trash2, CalendarCheck } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  ShoppingCart,
+  X,
+  Trash2,
+  CalendarCheck,
+  PackageOpen,
+} from "lucide-react";
 import { useCart } from "../context/CartContext";
 
 const CART_CSS = `
@@ -88,6 +94,31 @@ const CART_CSS = `
   @media (max-width: 480px) {
     .cart-fab { right: 16px; bottom: calc(80px + env(safe-area-inset-bottom)); width: 52px; height: 52px; }
   }
+  .cart-close-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,37,64,0.55);
+    backdrop-filter: blur(3px);
+    z-index: 1600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: cartFadeIn 0.2s ease;
+  }
+  .cart-close-confirm-card {
+    background: #fff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 360px;
+    padding: 28px 26px;
+    box-shadow: 0 24px 60px rgba(10,37,64,0.3);
+    animation: cartConfirmPop 0.22s ease;
+  }
+  @keyframes cartConfirmPop {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
 `;
 
 interface CartDrawerProps {
@@ -95,7 +126,11 @@ interface CartDrawerProps {
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
-  const { items, removeItem, total, isOpen, open, close } = useCart();
+  const { items, removeItem, clear, total, isOpen, open, close } = useCart();
+  // Closing with items still in the cart is easy to do by accident (tap
+  // outside, hit the X) — confirm first so a customer doesn't lose a
+  // half-built order without meaning to. An empty cart just closes normally.
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
 
   useEffect(() => {
     const id = "cart-drawer-styles";
@@ -113,6 +148,25 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
     };
   }, [isOpen]);
 
+  const requestClose = () => {
+    if (items.length > 0) {
+      setConfirmCloseOpen(true);
+    } else {
+      close();
+    }
+  };
+
+  const handleKeepItems = () => {
+    setConfirmCloseOpen(false);
+    close();
+  };
+
+  const handleDropItems = () => {
+    setConfirmCloseOpen(false);
+    clear();
+    close();
+  };
+
   return (
     <>
       <button
@@ -128,7 +182,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
 
       {isOpen && (
         <>
-          <div className="cart-drawer-overlay" onClick={close} />
+          <div className="cart-drawer-overlay" onClick={requestClose} />
           <div className="cart-drawer">
             <div
               style={{
@@ -151,7 +205,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
                 Your Cart
               </h2>
               <button
-                onClick={close}
+                onClick={requestClose}
                 aria-label="Close cart"
                 style={{
                   background: "#F3F8FF",
@@ -330,6 +384,104 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ onCheckout }) => {
             )}
           </div>
         </>
+      )}
+
+      {confirmCloseOpen && (
+        <div
+          className="cart-close-confirm-overlay"
+          onClick={() => setConfirmCloseOpen(false)}
+        >
+          <div
+            className="cart-close-confirm-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Keep or clear your cart"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: 14,
+              }}
+            >
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  background: "#F3F8FF",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <PackageOpen size={22} strokeWidth={2} color="#2979D8" />
+              </div>
+            </div>
+            <h3
+              style={{
+                fontFamily: "'Sora', sans-serif",
+                fontSize: "1.05rem",
+                fontWeight: 700,
+                color: "#0A2540",
+                margin: "0 0 8px",
+                textAlign: "center",
+              }}
+            >
+              It looks like you have {items.length} item
+              {items.length === 1 ? "" : "s"} in your cart
+            </h3>
+            <p
+              style={{
+                fontSize: "0.85rem",
+                color: "#4A6FA5",
+                textAlign: "center",
+                lineHeight: 1.6,
+                margin: "0 0 22px",
+              }}
+            >
+              Would you like to keep them for later, or drop them from your
+              cart?
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button
+                onClick={handleKeepItems}
+                style={{
+                  width: "100%",
+                  padding: "12px 0",
+                  borderRadius: 12,
+                  background: "linear-gradient(135deg, #2979D8, #1A4F8A)",
+                  color: "#fff",
+                  border: "none",
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                }}
+              >
+                Keep in Cart
+              </button>
+              <button
+                onClick={handleDropItems}
+                style={{
+                  width: "100%",
+                  padding: "12px 0",
+                  borderRadius: 12,
+                  background: "#FEF0F0",
+                  color: "#E74C3C",
+                  border: "1.5px solid #fde2e2",
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                }}
+              >
+                Drop Items
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

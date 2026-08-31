@@ -10,37 +10,22 @@ import GalleryPage from "./pages/GalleryPage";
 import HistoryPage from "./pages/HistoryPage";
 import "./styles/globals.css";
 
-const App: React.FC = () => {
+// The booking modal is now always cart-driven (see BookingModal.tsx) — it
+// reads straight from CartContext and shows whatever's already been added,
+// so there's no more "direct plan" vs "cart checkout" distinction to track
+// here. Every entry point (nav button, mobile sticky bar, "Proceed to Book"
+// in the cart drawer) just opens the same modal.
+const AppContent: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | undefined>();
-  const [cartCheckout, setCartCheckout] = useState(false);
   const location = useLocation();
 
-  const handleSelectPlan = (planName: string) => {
-    setSelectedPlan(planName);
-    setCartCheckout(false);
-    setModalOpen(true);
-    history.replaceState(null, "", "#book");
-  };
-
   const handleOpenBooking = () => {
-    setSelectedPlan(undefined);
-    setCartCheckout(false);
-    setModalOpen(true);
-    history.replaceState(null, "", "#book");
-  };
-
-  const handleCartCheckout = () => {
-    setSelectedPlan(undefined);
-    setCartCheckout(true);
     setModalOpen(true);
     history.replaceState(null, "", "#book");
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    setSelectedPlan(undefined);
-    setCartCheckout(false);
     // Remove hash when modal closes
     history.replaceState(null, "", window.location.pathname);
   };
@@ -63,13 +48,7 @@ const App: React.FC = () => {
   // Sync modal state with hash changes (browser back/forward)
   useEffect(() => {
     const handler = () => {
-      if (window.location.hash === "#book") {
-        setModalOpen(true);
-      } else {
-        setModalOpen(false);
-        setSelectedPlan(undefined);
-        setCartCheckout(false);
-      }
+      setModalOpen(window.location.hash === "#book");
     };
     window.addEventListener("hashchange", handler);
     return () => window.removeEventListener("hashchange", handler);
@@ -84,43 +63,33 @@ const App: React.FC = () => {
   }, [location.pathname]);
 
   return (
-    <CartProvider>
+    <>
       <Navbar onOpenBooking={handleOpenBooking} />
       <main>
         <Routes>
           <Route
             path="/"
-            element={
-              <Home
-                onOpenBooking={handleOpenBooking}
-                onSelectPlan={handleSelectPlan}
-              />
-            }
+            element={<Home onOpenBooking={handleOpenBooking} />}
           />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route
             path="*"
-            element={
-              <Home
-                onOpenBooking={handleOpenBooking}
-                onSelectPlan={handleSelectPlan}
-              />
-            }
+            element={<Home onOpenBooking={handleOpenBooking} />}
           />
         </Routes>
       </main>
       <Footer />
-      <CartDrawer onCheckout={handleCartCheckout} />
-      <BookingModal
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-        preselectedService={selectedPlan}
-        onServiceConsumed={() => setSelectedPlan(undefined)}
-        cartMode={cartCheckout}
-      />
-    </CartProvider>
+      <CartDrawer onCheckout={handleOpenBooking} />
+      <BookingModal isOpen={modalOpen} onClose={handleCloseModal} />
+    </>
   );
 };
+
+const App: React.FC = () => (
+  <CartProvider>
+    <AppContent />
+  </CartProvider>
+);
 
 export default App;

@@ -1,7 +1,7 @@
 // ─── Data Types ───────────────────────────────────────────────
 
 // Keys into the icon maps declared alongside each component
-// (see IconKey usage in Services.tsx, History.tsx, ContactStrip.tsx).
+// (see IconKey usage in History.tsx, ContactStrip.tsx).
 export type IconKey = string;
 
 export interface TimelineItem {
@@ -9,13 +9,6 @@ export interface TimelineItem {
   icon: IconKey;
   title: string;
   description: string;
-}
-
-export interface ServiceItem {
-  icon: IconKey;
-  title: string;
-  description: string;
-  tag: string;
 }
 
 // ─── Add-ons / configurable plans ───────────────────────────────
@@ -82,6 +75,26 @@ export interface CartItem {
   addOns: CartAddOnSelection[];
   totalPrice: number;
   estimatedTime?: string;
+
+  // ─── Per-vehicle booking details ──────────────────────────────
+  // Filled in on the booking form itself (not at add-to-cart time), since a
+  // customer often hasn't decided addresses/dates until they see the whole
+  // order together. Each cart item represents one "Vehicle #N" in the form.
+  vehicleType?: string; // "Bike" | "Scooty" — only meaningful for Bike Wash items
+  vehicleModel?: string;
+  vehicleNumber?: string;
+  address?: string;
+  locality?: string;
+  preferredDate?: string;
+
+  // When true (the default for every item after the first), this item's
+  // Address+Locality / Preferred Date / Vehicle Model mirror Vehicle #1's —
+  // see the "Same as Vehicle #1" checkboxes in BookingModal. Meaningless for
+  // the first item, which always shows and owns its own values. Vehicle
+  // Number has no such shortcut — it's always entered per vehicle.
+  sameAddressAsFirst?: boolean;
+  sameDateAsFirst?: boolean;
+  sameModelAsFirst?: boolean;
 }
 
 export interface ContactInfo {
@@ -100,18 +113,29 @@ export interface ReviewItem {
 
 // ─── Form Types ───────────────────────────────────────────────
 
+// Shared contact details — the only fields that apply to the whole booking
+// rather than to one vehicle. Everything vehicle-specific now lives on each
+// CartItem (see above) and is resolved into a VehicleBookingPayload per item
+// at submit time.
 export interface BookingFormData {
   from_name: string;
   from_email: string;
   phone: string;
-  address: string;
+  message: string;
+}
+
+// One resolved, ready-to-send vehicle line — "Same as Vehicle #1" checkboxes
+// have already been applied, so every field here is a concrete value.
+export interface VehicleBookingPayload {
+  vehicleLabel: string; // "Vehicle #1", "Vehicle #2", …
   service: string;
-  vehicle: string;
+  vehicleType: string; // "Bike" | "Scooty" | "" (cars carry their type inside `service`)
   vehicleModel: string;
   vehicleNumber: string;
-  preferred_date: string;
-  price: string; // final price including surcharge
-  message: string;
+  address: string;
+  locality: string;
+  preferredDate: string;
+  price: string;
 }
 
 export type ToastStatus = "idle" | "success" | "error";

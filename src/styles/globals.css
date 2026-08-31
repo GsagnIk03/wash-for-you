@@ -250,10 +250,3 @@ input[type="datetime-local"] {
     background-position: 200% 50%;
   }
 }
-
-/* ─── Services grid (auto-fit) ──────────────────────────────── */
-@media (max-width: 600px) {
-  .services-grid {
-    grid-template-columns: 1fr !important;
-  }
-}

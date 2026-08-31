@@ -11,6 +11,8 @@ import {
   ShoppingCart,
   Star,
   X,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useInView } from "../hooks";
 import { useCart } from "../context/CartContext";
@@ -30,10 +32,6 @@ const PRICING_BG_IMAGES: Record<string, string> = {
   premium: bgPremium,
   bike: bgBike,
 };
-
-interface PricingProps {
-  onSelectPlan: (planName: string) => void;
-}
 
 const PRICING_CSS = `
   .pricing-all-grid {
@@ -313,7 +311,7 @@ const PRICING_CSS = `
   .addon-modal-cta:hover { filter: brightness(1.06); }
 `;
 
-const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
+const Pricing: React.FC = () => {
   useEffect(() => {
     const id = "pricing-responsive-styles";
     if (document.getElementById(id)) return;
@@ -354,12 +352,7 @@ const Pricing: React.FC<PricingProps> = ({ onSelectPlan }) => {
       {/* All plans in one row */}
       <div className="pricing-all-grid">
         {allPlans.map((plan, i) => (
-          <PricingCard
-            key={i}
-            plan={plan}
-            delay={i * 80}
-            onSelect={() => onSelectPlan(plan.name)}
-          />
+          <PricingCard key={i} plan={plan} delay={i * 80} />
         ))}
       </div>
 
@@ -480,11 +473,9 @@ const SubscriptionCallout: React.FC = () => {
 const PricingCard: React.FC<{
   plan: PricingPlan;
   delay: number;
-  onSelect: () => void;
-}> = ({ plan, delay, onSelect }) => {
+}> = ({ plan, delay }) => {
   const [ref, inView] = useInView<HTMLDivElement>();
   const [hovered, setHovered] = React.useState(false);
-  const [btnHovered, setBtnHovered] = React.useState(false);
   const [addOnModalOpen, setAddOnModalOpen] = React.useState(false);
   const cart = useCart();
   const bgImage = plan.bgImageKey
@@ -492,9 +483,25 @@ const PricingCard: React.FC<{
     : undefined;
   const hasAddOns = !!plan.addOnGroups && plan.addOnGroups.length > 0;
 
-  // Bike Wash has nothing to configure, so it skips the customization sheet
-  // and goes straight into the cart at its flat price.
-  const handleBikeAddToCart = () => {
+  // Every instance of this exact plan already sitting in the cart — drives
+  // the "+1" quantity stepper below, so a customer booking for two vehicles
+  // can add the same plan again instead of the button looking like a no-op.
+  // Adding never opens the cart drawer — the stepper itself is the feedback,
+  // so the customer stays put on the pricing page.
+  const itemsForPlan = cart.items.filter((i) => i.planName === plan.name);
+  const countInCart = itemsForPlan.length;
+
+  // "-" / trash removes the most recently added instance of this plan —
+  // mirrors a quantity stepper's decrement rather than clearing every one.
+  const removeOneFromCart = () => {
+    const last = itemsForPlan[itemsForPlan.length - 1];
+    if (last) cart.removeItem(last.id);
+  };
+
+  // Plans with no add-on groups (Bike Wash today) have nothing to configure,
+  // so they skip the customization sheet and go straight into the cart at
+  // their flat price — same button handles the first add and every "+" after.
+  const handleSimpleAddToCart = () => {
     cart.addItem({
       planName: plan.name,
       basePrice: plan.price,
@@ -855,32 +862,43 @@ const PricingCard: React.FC<{
               </span>
             </div>
 
-            {/* Opens the Swiggy/Zomato-style customization sheet */}
-            <button
-              type="button"
-              className="addon-cta-btn"
-              onClick={() => setAddOnModalOpen(true)}
-              style={{
-                width: "100%",
-                padding: "12px 0",
-                borderRadius: 12,
-                background: "#3ECFCF",
-                color: "#0A2540",
-                border: "none",
-                fontWeight: 700,
-                fontSize: "0.88rem",
-                cursor: "pointer",
-                fontFamily: "'Inter', sans-serif",
-                letterSpacing: "0.01em",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-              }}
-            >
-              <ShoppingCart size={15} strokeWidth={2.3} />
-              Customise &amp; Add to Cart
-            </button>
+            {/* Opens the Swiggy/Zomato-style customization sheet — once at
+                least one is in the cart, this collapses into an "In Cart"
+                indicator plus a "+" that reopens the same sheet to configure
+                (or just re-confirm) another one, e.g. for a second vehicle. */}
+            {countInCart === 0 ? (
+              <button
+                type="button"
+                className="addon-cta-btn"
+                onClick={() => setAddOnModalOpen(true)}
+                style={{
+                  width: "100%",
+                  padding: "12px 0",
+                  borderRadius: 12,
+                  background: "#3ECFCF",
+                  color: "#0A2540",
+                  border: "none",
+                  fontWeight: 700,
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  fontFamily: "'Inter', sans-serif",
+                  letterSpacing: "0.01em",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <ShoppingCart size={15} strokeWidth={2.3} />
+                Customise &amp; Add to Cart
+              </button>
+            ) : (
+              <InCartRow
+                count={countInCart}
+                onAddAnother={() => setAddOnModalOpen(true)}
+                onRemoveOne={removeOneFromCart}
+              />
+            )}
 
             {addOnModalOpen && (
               <AddOnModal
@@ -954,12 +972,14 @@ const PricingCard: React.FC<{
               </span>
             </div>
 
-            {/* CTA */}
-            {plan.isBike ? (
+            {/* CTA — no add-on groups to configure, so the first click adds
+                it outright; once it's in the cart this becomes the same
+                "In Cart" + "+" pattern the customizable plans use above. */}
+            {countInCart === 0 ? (
               <button
                 type="button"
                 className="addon-cta-btn"
-                onClick={handleBikeAddToCart}
+                onClick={handleSimpleAddToCart}
                 style={{
                   width: "100%",
                   padding: "12px 0",
@@ -982,33 +1002,11 @@ const PricingCard: React.FC<{
                 Add to Cart
               </button>
             ) : (
-              <button
-                onClick={onSelect}
-                onMouseEnter={() => setBtnHovered(true)}
-                onMouseLeave={() => setBtnHovered(false)}
-                style={{
-                  width: "100%",
-                  padding: "12px 0",
-                  borderRadius: 12,
-                  background: plan.featured
-                    ? "#3ECFCF"
-                    : btnHovered
-                      ? "rgba(255,255,255,0.14)"
-                      : "transparent",
-                  color: plan.featured ? "#0A2540" : "#fff",
-                  border: plan.featured
-                    ? "none"
-                    : "2px solid rgba(255,255,255,0.3)",
-                  fontWeight: 700,
-                  fontSize: "0.88rem",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  fontFamily: "'Inter', sans-serif",
-                  letterSpacing: "0.01em",
-                }}
-              >
-                Book This Plan
-              </button>
+              <InCartRow
+                count={countInCart}
+                onAddAnother={handleSimpleAddToCart}
+                onRemoveOne={removeOneFromCart}
+              />
             )}
           </>
         )}
@@ -1016,6 +1014,86 @@ const PricingCard: React.FC<{
     </div>
   );
 };
+
+// Replaces a plan's CTA once at least one is already in the cart — confirms
+// it's in, shows how many, and offers a "+" to add another for a second
+// vehicle without losing track of what's already been added.
+// Quantity-stepper style feedback once a plan is in the cart: a "+N" badge
+// showing exactly how many of this plan are queued up, plus a delete button
+// (removes the most recently added one) and the existing "add another"
+// button — no drawer pops open, the customer just watches this row update.
+const InCartRow: React.FC<{
+  count: number;
+  onAddAnother: () => void;
+  onRemoveOne: () => void;
+}> = ({ count, onAddAnother, onRemoveOne }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <div
+      style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        padding: "12px 0",
+        borderRadius: 12,
+        background: "rgba(62,207,207,0.14)",
+        border: "1.5px solid rgba(62,207,207,0.4)",
+        color: "#3ECFCF",
+        fontWeight: 700,
+        fontSize: "0.85rem",
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      <Check size={15} strokeWidth={2.8} />+{count} in cart
+    </div>
+    <button
+      type="button"
+      onClick={onRemoveOne}
+      aria-label="Remove one from cart"
+      title="Remove one from cart"
+      style={{
+        width: 46,
+        height: 46,
+        flexShrink: 0,
+        borderRadius: 12,
+        background: "rgba(220,53,69,0.12)",
+        color: "#DC3545",
+        border: "1.5px solid rgba(220,53,69,0.35)",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Trash2 size={18} strokeWidth={2} />
+    </button>
+    <button
+      type="button"
+      className="addon-cta-btn"
+      onClick={onAddAnother}
+      aria-label="Add another"
+      title="Add another"
+      style={{
+        width: 46,
+        height: 46,
+        flexShrink: 0,
+        borderRadius: 12,
+        background: "#3ECFCF",
+        color: "#0A2540",
+        border: "none",
+        fontWeight: 800,
+        fontSize: "1.2rem",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Plus size={20} strokeWidth={2.8} />
+    </button>
+  </div>
+);
 
 // ─── Swiggy/Zomato-style add-on customization sheet ─────────────────────────
 // Opens as a bottom sheet on mobile and a centered modal on desktop. Rendered

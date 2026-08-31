@@ -1,11 +1,35 @@
 import type {
   TimelineItem,
-  ServiceItem,
   PricingPlan,
   AddonItem,
   ContactInfo,
   ReviewItem,
 } from "../types";
+
+// The neighbourhoods we currently send technicians to — shown in the "Why
+// Wash For U?" section's Service Areas chips, and reused by the booking
+// form's Locality field to gate car/bike bookings to areas we can actually
+// reach (see BookingModal.tsx).
+export const SERVICE_AREAS = [
+  "Abhishikta",
+  "Ajaynagar",
+  "Baghajatin",
+  "Ballygunge",
+  "Garia",
+  "Golpark",
+  "Haltu",
+  "Jadavpur",
+  "Jadavpur P.S",
+  "Mukundapur",
+  "New Garia",
+  "Panchashayar",
+  "Patuli",
+  "Ramlal Bazar",
+  "Safuipara",
+  "South City Mall",
+  "Survey Park",
+  "Tollygunge",
+];
 
 export const TIMELINE_ITEMS: TimelineItem[] = [
   {
@@ -35,51 +59,6 @@ export const TIMELINE_ITEMS: TimelineItem[] = [
     title: "Built on Word of Mouth",
     description:
       "Every booking referral is a vote of confidence. We are growing step by step, driven by customer satisfaction and a commitment to showing up, every single time.",
-  },
-];
-
-export const SERVICES: ServiceItem[] = [
-  {
-    icon: "droplets",
-    title: "Pressure Exterior Wash",
-    description:
-      "High-pressure jets clear away road grime, dust, bird droppings, and pollutants from every exterior surface — including under the wheel arches. Customers provide water and an electric point.",
-    tag: "Most Popular",
-  },
-  {
-    icon: "shield-check",
-    title: "Interior Deep Clean",
-    description:
-      "We deep clean upholstery, seat crevices, carpets, and floor mats — eliminating bacteria, allergens, and odours. Dashboard, door panels, and AC vents get a thorough wipe-down.",
-    tag: "Hygienic",
-  },
-  {
-    icon: "award",
-    title: "Full Car Detailing",
-    description:
-      "Our comprehensive package combines exterior pressure wash, interior deep clean, dashboard polish, tyre dressing, interior steam cleaning, roof clean, and a streak-free glass treatment.",
-    tag: "Premium",
-  },
-  {
-    icon: "disc",
-    title: "Tyre & Alloy Wheel Clean",
-    description:
-      "Stubborn brake dust and kerb grime are no match for our pressure jets. Alloy wheels are cleaned and dressed to restore their original shine safely without causing damage.",
-    tag: "Add-on Available",
-  },
-  {
-    icon: "bike",
-    title: "Bike Wash",
-    description:
-      "Professional doorstep bike wash covering full exterior body, fuel tank, fairings, wheels, and tyres. We skip the chain to preserve lubrication — everything else gets a showroom finish.",
-    tag: "Two-Wheelers",
-  },
-  {
-    icon: "truck",
-    title: "SUV & Commercial Wash",
-    description:
-      "Dedicated wash packages for SUVs, MPVs, and commercial vehicles with extended reach equipment and reinforced cleaning protocols. Full interior and exterior coverage.",
-    tag: "All Sizes",
   },
 ];
 
@@ -209,7 +188,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     price: 1299,
     bgImageKey: "advance",
     fullPhotoBg: true,
-    estimatedTime: "120-150 minutes — varies with add-ons selected",
+    estimatedTime: "2–2.5 hours — varies with add-ons selected",
     features: [
       "Exterior pressure wash",
       "Foam wash",
